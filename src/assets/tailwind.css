@@ -1,0 +1,10 @@
+/* src/assets/tailwind.css */
+
+/* Tailwind’s base styles (normalize + global defaults) */
+@tailwind base;
+
+/* Tailwind’s component classes */
+@tailwind components;
+
+/* Tailwind’s utility classes (margin, padding, grid, etc.) */
+@tailwind utilities;
