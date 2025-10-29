@@ -1,218 +1,158 @@
 <template>
-  <div
-    class="font-sans bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4"
-  >
-    <div class="max-w-md w-full mx-auto">
-      <!-- Header -->
-      <div class="text-center mb-10">
-        <h1 class="text-3xl font-bold text-gray-800 mb-3">Welcome Back</h1>
-        <p class="text-gray-600">Sign in to your account to continue</p>
-      </div>
-
-      <!-- Login Card -->
-      <div
-        class="w-full bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl"
-      >
+  <div class="max-w-6xl w-full mx-auto">
+    <!-- Forms Container -->
+    <div class="flex flex-col lg:flex-row gap-8 items-center justify-center">
+      
+      <!-- Login Form -->
+      <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
         <div class="p-8">
-          <div class="space-y-5">
+          <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold text-gray-800">Welcome Back</h2>
+            <p class="text-gray-600 mt-2">Sign in to your account</p>
+          </div>
+          
+          <form class="space-y-6" @submit.prevent="handleLogin">
             <div>
-              <label
-                for="username"
-                class="block text-sm font-medium text-gray-700 mb-2"
-                >Username or Email</label
-              >
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
               <div class="relative">
-                <div
-                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                >
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <i class="fas fa-envelope text-gray-400"></i>
                 </div>
-                <input
-                  v-model="username"
-                  type="text"
-                  id="username"
-                  class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
+                <input 
+                  type="email" 
+                  id="email" 
+                  v-model="form.email"
+                  class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200" 
                   placeholder="you@example.com"
-                />
+                  required
+                >
               </div>
             </div>
-
+            
             <div>
-              <div class="flex items-center justify-between mb-2">
-                <label
-                  for="password"
-                  class="block text-sm font-medium text-gray-700"
-                  >Password</label
-                >
-                <a
-                  href="#"
-                  class="text-sm font-medium text-primary-600 hover:text-primary-500 transition-colors"
-                  >Forgot password?</a
-                >
+              <div class="flex items-center justify-between mb-1">
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <a href="#" class="text-sm font-medium text-primary-600 hover:text-primary-500 transition-colors">Forgot password?</a>
               </div>
               <div class="relative">
-                <div
-                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                >
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <i class="fas fa-lock text-gray-400"></i>
                 </div>
-                <input
-                  :type="showPassword ? 'text' : 'password'"
-                  v-model="password"
-                  id="password"
-                  class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
+                <input 
+                  :type="showPassword ? 'text' : 'password'" 
+                  id="password" 
+                  v-model="form.password"
+                  class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200" 
                   placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  @click="showPassword = !showPassword"
-                  class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  required
                 >
-                  <i
-                    :class="[
-                      'fas',
-                      showPassword ? 'fa-eye-slash' : 'fa-eye',
-                      'text-gray-400 hover:text-gray-600 transition-colors',
-                    ]"
+                <button 
+                  type="button" 
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  @click="togglePasswordVisibility"
+                >
+                  <i 
+                    :class="showPassword ? 'fas fa-eye-slash text-gray-600' : 'fas fa-eye text-gray-400'" 
+                    class="hover:text-gray-600 transition-colors"
                   ></i>
                 </button>
               </div>
             </div>
-
-            <div class="flex items-center pt-2">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
+            
+            <div class="flex items-center">
+              <input 
+                id="remember-me" 
+                name="remember-me" 
+                type="checkbox" 
+                v-model="form.rememberMe"
                 class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-              />
-              <label for="remember-me" class="ml-2 block text-sm text-gray-700"
-                >Remember me</label
               >
+              <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
             </div>
-
-            <div class="pt-2">
-              <button
-                @click="handleLogin"
-                :disabled="loading"
-                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 transform hover:-translate-y-0.5"
-              >
-                <span v-if="loading">Signing in...</span>
-                <span v-else>Sign in</span>
-              </button>
-            </div>
-
-            <p v-if="error" class="text-red-500 text-sm mt-2 text-center">
-              {{ error }}
-            </p>
-          </div>
-
-          <!-- Social Login -->
+            
+            <!-- This button will now be BLUE using primary colors -->
+            <button 
+              type="submit" 
+              class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 transform hover:-translate-y-0.5"
+            >
+              Sign in
+            </button>
+          </form>
+          
           <div class="mt-8">
             <div class="relative">
               <div class="absolute inset-0 flex items-center">
                 <div class="w-full border-t border-gray-300"></div>
               </div>
               <div class="relative flex justify-center text-sm">
-                <span class="px-3 bg-white text-gray-500"
-                  >Or continue with</span
-                >
+                <span class="px-2 bg-white text-gray-500">Or continue with</span>
               </div>
             </div>
-
-            <div class="mt-5 grid grid-cols-3 gap-3">
-              <!-- TODO: integrate Google Login -->
-              <button
-                type="button"
-                class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            
+            <div class="mt-4 flex justify-center gap-4">
+              <button 
+                type="button" 
+                class="w-1/3 inline-flex justify-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                @click="socialLogin('google')"
               >
                 <i class="fab fa-google text-red-500"></i>
               </button>
-
-              <!-- TODO: integrate Facebook Login -->
-              <button
-                type="button"
-                class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <i class="fab fa-facebook-f text-blue-600"></i>
-              </button>
-
-              <!-- TODO: integrate GitHub Login -->
-              <button
-                type="button"
-                class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              <button 
+                type="button" 
+                class="w-1/3 inline-flex justify-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                @click="socialLogin('github')"
               >
                 <i class="fab fa-github text-gray-800"></i>
               </button>
             </div>
           </div>
-
+          
           <div class="mt-8 text-center">
             <p class="text-sm text-gray-600">
               Don't have an account?
-              <RouterLink
-                to="/register"
-                class="font-medium text-primary-600 hover:text-primary-500 transition-colors ml-1"
-                >Sign up</RouterLink
-              >
+              <a href="#" class="font-medium text-primary-600 hover:text-primary-500 transition-colors">Sign up</a>
             </p>
           </div>
         </div>
       </div>
-
-      <div class="text-center mt-8 text-gray-500 text-sm">
-        <p>© 2025 Codementor Platform. All rights reserved.</p>
-      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="text-center mt-10 text-gray-500 text-sm">
+      <p>© 2023 Beautiful Forms. All rights reserved.</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter, RouterLink } from 'vue-router'
-import { useUserStore } from '../../store/user'
+import { ref, reactive } from 'vue'
 
-const API_BASE = 'http://localhost:3000'
-const username = ref('')
-const password = ref('')
+// Reactive form data
+const form = reactive({
+  email: '',
+  password: '',
+  rememberMe: false
+})
+
+// Password visibility state
 const showPassword = ref(false)
-const error = ref('')
-const loading = ref(false)
-const router = useRouter()
-const user = useUserStore()
 
-function saveTokens({ access_token, refresh_token }) {
-  localStorage.setItem('access_token', access_token)
-  localStorage.setItem('refresh_token', refresh_token)
+// Toggle password visibility
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value
 }
 
-async function handleLogin() {
-  error.value = ''
-  loading.value = true
-  try {
-    const res = await fetch(`${API_BASE}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.value, password: password.value }),
-    })
+// Handle form submission
+const handleLogin = () => {
+  console.log('Login attempt with:', form)
+  // Here you would typically make an API call to authenticate the user
+  // For now, we'll just log the form data
+  alert(`Login attempted with:\nEmail: ${form.email}\nPassword: ${form.password}\nRemember me: ${form.rememberMe}`)
+}
 
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.error || 'Login failed')
-
-    saveTokens(data.tokens)
-    user.login({
-      id: data.user.id,
-      username: data.user.username,
-      email: data.user.email,
-      token: data.tokens.access_token,
-      role: data.user.role,
-    })
-
-    router.push(data.user.role === 'admin' ? '/admin' : '/')
-  } catch (err) {
-    error.value = err.message
-  } finally {
-    loading.value = false
-  }
+// Handle social login
+const socialLogin = (provider) => {
+  console.log(`Social login with ${provider}`)
+  alert(`Redirecting to ${provider} authentication...`)
 }
 </script>
