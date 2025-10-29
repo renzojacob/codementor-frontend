@@ -165,10 +165,9 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref } from 'vue'
-import { useRouter, RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const API_BASE = 'http://localhost:3000'
 const router = useRouter()
@@ -185,6 +184,8 @@ const error = ref('')
 
 async function handleRegister() {
   error.value = ''
+
+  // Validation
   if (!agree.value) {
     error.value = 'You must agree to the Terms and Conditions.'
     return
@@ -195,11 +196,13 @@ async function handleRegister() {
   }
 
   loading.value = true
+
   try {
+    // Use JSON for request body
     const res = await fetch(`${API_BASE}/register`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         username: username.value,
         email: email.value,
         password: password.value,
@@ -208,9 +211,12 @@ async function handleRegister() {
     })
 
     const data = await res.json()
+
     if (!res.ok) throw new Error(data.error || 'Registration failed')
 
-    alert(data.message || 'Registration successful!')
+    // Alert user that registration & email were successful
+    alert(data.message || 'Registration successful! Check your email.')
+
     router.push('/login')
   } catch (err) {
     error.value = err.message

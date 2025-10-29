@@ -5,6 +5,7 @@ import Challenge from './pages/Challenge.vue';
 import Leaderboard from './pages/Leaderboard.vue';
 import Login from './pages/Login.vue';
 import Register from './pages/Register.vue'; // 👈 add this
+import VerifyEmail from './pages/VerifyEmail.vue';
 
 const routes = [
   { path: '/', component: Home, meta: { layout: 'PublicLayout' } },
@@ -13,6 +14,7 @@ const routes = [
   { path: '/tutorials', component: Tutorials, meta: { layout: 'PublicLayout' } },
   { path: '/challenge/:id', component: Challenge, meta: { layout: 'ChallengeLayout' } },
   { path: '/leaderboard', component: Leaderboard, meta: { layout: 'PublicLayout' } },
+  { path: '/verify-email', component: VerifyEmail, meta: { layout: 'PublicLayout' } },
 ];
 
 const router = createRouter({
