@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeMentorAI - Challenges Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        elegant: {
+                            blue: '#3b82f6',
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            teal: '#14b8a6',
+                            amber: '#f59e0b',
+                            gray: '#6b7280',
+                            indigo: '#6366f1',
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            rose: '#f43f5e'
+                        }
+                    },
+                    animation: {
+                        'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-in': 'slide-in 0.5s ease-out',
+                        'bounce-soft': 'bounce-soft 2s infinite',
+                        'gradient-x': 'gradient-x 15s ease infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'typewriter': 'typewriter 4s steps(40) 1s 1 normal both',
+                        'ping-slow': 'ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                        'spin-slow': 'spin-slow 3s linear infinite',
+                        'fade-in-up': 'fade-in-up 0.6s ease-out',
+                        'shimmer': 'shimmer 2s infinite linear'
+                    },
+                    keyframes: {
+                        'pulse-soft': {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.8 }
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        'slide-in': {
+                            '0%': { transform: 'translateX(-100%)', opacity: 0 },
+                            '100%': { transform: 'translateX(0)', opacity: 1 }
+                        },
+                        'bounce-soft': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        },
+                        'gradient-x': {
+                            '0%, 100%': { 'background-position': '0% 50%' },
+                            '50%': { 'background-position': '100% 50%' }
+                        },
+                        'glow': {
+                            'from': { 'box-shadow': '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #3b82f6, 0 0 20px #3b82f6' },
+                            'to': { 'box-shadow': '0 0 10px #fff, 0 0 15px #3b82f6, 0 0 20px #3b82f6, 0 0 25px #3b82f6' }
+                        },
+                        'wiggle': {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' }
+                        },
+                        'typewriter': {
+                            'from': { width: '0' },
+                            'to': { width: '100%' }
+                        },
+                        'ping-slow': {
+                            '75%, 100%': {
+                                transform: 'scale(2)',
+                                opacity: '0'
+                            }
+                        },
+                        'spin-slow': {
+                            'from': { transform: 'rotate(0deg)' },
+                            'to': { transform: 'rotate(360deg)' }
+                        },
+                        'fade-in-up': {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(30px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        },
+                        'shimmer': {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        
+        .ai-avatar {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+        
+        .ai-training-progress {
+            height: 8px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .ai-training-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-flag {
+            position: relative;
+        }
+        
+        .feature-flag input {
+            opacity: 0;
+            position: absolute;
+        }
+        
+        .feature-flag-slider {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            background-color: #d1d5db;
+            border-radius: 34px;
+            transition: .4s;
+        }
+        
+        .feature-flag-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .4s;
+        }
+        
+        .feature-flag input:checked + .feature-flag-slider {
+            background-color: #10b981;
+        }
+        
+        .feature-flag input:checked + .feature-flag-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .mobile-menu {
+            display: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: flex;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .chart-container {
+                height: 200px !important;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .stat-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .main-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .activity-feed {
+                max-height: 300px !important;
+            }
+        }
+        
+        .compact-card {
+            padding: 1rem !important;
+        }
+        
+        .dense-grid {
+            gap: 1rem !important;
+        }
+        
+        .no-white-space {
+            margin: 0;
+            padding: 0.5rem;
+        }
+        
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .tab-button.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .tab-button:not(.active):hover {
+            background-color: #f3f4f6;
+        }
+        
+        .difficulty-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .difficulty-easy {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .difficulty-medium {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .difficulty-hard {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .difficulty-expert {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        .testcase-card {
+            border-left: 4px solid #3b82f6;
+            transition: all 0.2s ease;
+        }
+        
+        .testcase-public {
+            border-left-color: #10b981;
+        }
+        
+        .testcase-hidden {
+            border-left-color: #f59e0b;
+        }
+        
+        .testcase-private {
+            border-left-color: #ef4444;
+        }
+        
+        .hint-card {
+            border-left: 4px solid #8b5cf6;
+            transition: all 0.2s ease;
+        }
+        
+        .hint-card:hover {
+            background-color: #f8fafc;
+        }
+        
+        .code-editor {
+            font-family: 'Courier New', monospace;
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .code-line {
+            margin-bottom: 0.25rem;
+        }
+        
+        .code-keyword {
+            color: #f472b6;
+        }
+        
+        .code-function {
+            color: #60a5fa;
+        }
+        
+        .code-string {
+            color: #34d399;
+        }
+        
+        .code-comment {
+            color: #94a3b8;
+        }
+        
+        .markdown-preview {
+            background-color: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 200px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background-color: #f0f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+        }
+        
+        /* Responsive Design Enhancements */
+        @media (max-width: 480px) {
+            .mobile-compact {
+                padding: 0.75rem !important;
+            }
+            
+            .mobile-text-sm {
+                font-size: 0.75rem !important;
+            }
+            
+            .mobile-stack {
+                flex-direction: column !important;
+            }
+            
+            .mobile-center {
+                text-align: center !important;
+            }
+            
+            .mobile-full {
+                width: 100% !important;
+            }
+            
+            .mobile-hidden {
+                display: none !important;
+            }
+            
+            .mobile-grid-1 {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        
+        @media (max-width: 768px) and (min-width: 481px) {
+            .tablet-grid-2 {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        
+        /* Touch-friendly interactions */
+        @media (hover: none) {
+            .card-hover:hover {
+                transform: none;
+            }
+            
+            .card-hover:active {
+                transform: translateY(-2px);
+            }
+        }
+        
+        /* Improved scrolling for mobile */
+        .mobile-scroll {
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Better tap targets for mobile */
+        .mobile-tap-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Custom scrollbar for code editor */
+        .code-editor::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .code-editor::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        .code-editor::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        
+        .code-editor::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen overflow-x-hidden no-white-space">
+    <!-- Mobile Header -->
+    <div class="mobile-menu glass border-b border-gray-200 p-3 flex justify-between items-center lg:hidden">
+        <div class="flex items-center space-x-3">
+            <div class="ai-avatar w-10 h-10">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold gradient-text">CodeMentorAI</h1>
+            </div>
+        </div>
+        <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors mobile-tap-target" id="mobile-menu-button">
+            <i class="fas fa-bars text-elegant-gray"></i>
+        </button>
+    </div>
+
+    <div class="flex h-screen">
+        <!-- Main Content -->
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
+            <!-- Enhanced Top Bar -->
+            <header class="glass border-b border-gray-200 p-3 flex justify-between items-center mobile-stack md:flex-row">
+                <div class="flex items-center space-x-3 mobile-full md:w-auto">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center mobile-center md:text-left">
+                        <span class="hidden sm:inline">Challenges Management</span>
+                        <span class="live-indicator ml-2">LIVE</span>
+                    </h2>
+                    <div class="relative hidden md:block">
+                        <input type="text" placeholder="Search challenges..." class="bg-white border border-gray-300 rounded-lg pl-9 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-elegant-blue/50 w-64 text-sm">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-elegant-gray text-sm"></i>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-2 mt-2 md:mt-0">
+                    <div class="flex space-x-1">
+                        <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors relative mobile-tap-target">
+                            <i class="fas fa-bell text-elegant-gray text-sm"></i>
+                            <span class="notification-dot" style="top: 4px; right: 4px;"></span>
+                        </button>
+                        <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors mobile-tap-target">
+                            <i class="fas fa-comment-alt text-elegant-gray text-sm"></i>
+                        </button>
+                        <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors mobile-tap-target">
+                            <i class="fas fa-cog text-elegant-gray text-sm"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 bg-white rounded-lg p-1.5 border border-gray-200 shadow-sm">
+                        <div class="ai-avatar w-6 h-6">
+                            <span class="text-xs font-bold">A</span>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Admin</span>
+                        <i class="fas fa-chevron-down text-elegant-gray text-xs"></i>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Challenges Content -->
+            <main class="flex-1 overflow-y-auto p-3 dense-grid mobile-scroll">
+                <!-- Challenges Overview -->
+                <div class="mb-4">
+                    <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                            <div class="flex-1">
+                                <h1 class="text-xl sm:text-2xl font-bold mb-1 mobile-center sm:text-left">Challenge <span class="gradient-text">Management Hub</span> 💻</h1>
+                                <p class="text-xs sm:text-sm text-gray-600 mb-3 mobile-center sm:text-left">Create, edit, and manage coding challenges with comprehensive quality controls.</p>
+                                
+                                <div class="flex flex-wrap gap-1.5 mb-3 justify-center sm:justify-start">
+                                    <div class="flex items-center space-x-1 bg-green-50 text-green-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-check-circle text-xs"></i>
+                                        <span>142 Active Challenges</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-edit text-xs"></i>
+                                        <span>24 In Draft</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 bg-purple-50 text-purple-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-clock text-xs"></i>
+                                        <span>8 Scheduled</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 bg-amber-50 text-amber-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-exclamation-triangle text-xs"></i>
+                                        <span>3 Need Review</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Actions -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center mobile-tap-target" id="new-challenge-btn">
+                                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-plus text-elegant-blue text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">New Challenge</span>
+                                    </button>
+                                    
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center mobile-tap-target" id="import-challenges-btn">
+                                        <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-file-import text-elegant-purple text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Import</span>
+                                    </button>
+                                    
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center mobile-tap-target" id="moderation-queue-btn">
+                                        <div class="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-clipboard-check text-elegant-pink text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Moderation</span>
+                                    </button>
+                                    
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center mobile-tap-target" id="preview-challenge-btn">
+                                        <div class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-eye text-elegant-teal text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Preview</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Challenge Status -->
+                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-100 mt-4 sm:mt-0">
+                                <div class="flex items-center space-x-3">
+                                    <div class="ai-avatar w-12 h-12">
+                                        <i class="fas fa-code"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-gray-800">Challenge Pipeline</h3>
+                                        <p class="text-xs text-gray-600">Last updated: 2 min ago</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                                            <span class="text-xs text-green-600 font-medium">Test Runner Active</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Challenge Grid -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-4 main-grid mobile-grid-1">
+                    <!-- Left Column - Challenge Form -->
+                    <div class="xl:col-span-2 space-y-4">
+                        <!-- Challenge Form -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                                <h3 class="text-lg font-bold text-gray-800">1. Challenge Form</h3>
+                                <div class="flex items-center space-x-1 mt-2 sm:mt-0">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span class="text-xs text-green-600 font-medium">Saved</span>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Challenge Title</label>
+                                    <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="Enter challenge title" value="Two Sum">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                    <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                        <option>Algorithms</option>
+                                        <option>Data Structures</option>
+                                        <option>Web Development</option>
+                                        <option>Database</option>
+                                        <option>System Design</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+                                    <div class="flex space-x-2">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="difficulty" class="mr-1" checked>
+                                            <span class="difficulty-tag difficulty-easy">Easy</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="difficulty" class="mr-1">
+                                            <span class="difficulty-tag difficulty-medium">Medium</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="difficulty" class="mr-1">
+                                            <span class="difficulty-tag difficulty-hard">Hard</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="difficulty" class="mr-1">
+                                            <span class="difficulty-tag difficulty-expert">Expert</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                                    <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="Add tags (arrays, hashmap, etc.)" value="arrays, hashmap, two-pointer">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Problem Statement Editor -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                                <h3 class="text-lg font-bold text-gray-800">2. Problem Statement Editor</h3>
+                                <div class="flex space-x-1 mt-2 sm:mt-0">
+                                    <button class="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded mobile-tap-target">Preview</button>
+                                    <button class="px-2 py-0.5 text-xs bg-elegant-blue text-white rounded mobile-tap-target">Save</button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+                                    <button class="tab-button active" data-tab="editor">Editor</button>
+                                    <button class="tab-button" data-tab="preview">Preview</button>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content active" id="editor-tab">
+                                <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm h-60" placeholder="Write problem statement in Markdown...">
+# Two Sum
+
+Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+## Example 1
+
+**Input:** nums = [2,7,11,15], target = 9
+**Output:** [0,1]
+**Explanation:** Because nums[0] + nums[1] == 9, we return [0, 1].
+
+## Example 2
+
+**Input:** nums = [3,2,4], target = 6
+**Output:** [1,2]
+
+## Example 3
+
+**Input:** nums = [3,3], target = 6
+**Output:** [0,1]
+
+## Constraints
+
+- 2 <= nums.length <= 10^4
+- -10^9 <= nums[i] <= 10^9
+- -10^9 <= target <= 10^9
+- Only one valid answer exists.
+                                </textarea>
+                            </div>
+                            
+                            <div class="tab-content hidden" id="preview-tab">
+                                <div class="markdown-preview h-60 overflow-y-auto">
+                                    <h1>Two Sum</h1>
+                                    <p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.</p>
+                                    <p>You may assume that each input would have exactly one solution, and you may not use the same element twice.</p>
+                                    <p>You can return the answer in any order.</p>
+                                    <h2>Example 1</h2>
+                                    <p><strong>Input:</strong> nums = [2,7,11,15], target = 9<br>
+                                    <strong>Output:</strong> [0,1]<br>
+                                    <strong>Explanation:</strong> Because nums[0] + nums[1] == 9, we return [0, 1].</p>
+                                    <h2>Example 2</h2>
+                                    <p><strong>Input:</strong> nums = [3,2,4], target = 6<br>
+                                    <strong>Output:</strong> [1,2]</p>
+                                    <h2>Example 3</h2>
+                                    <p><strong>Input:</strong> nums = [3,3], target = 6<br>
+                                    <strong>Output:</strong> [0,1]</p>
+                                    <h2>Constraints</h2>
+                                    <ul>
+                                        <li>2 &lt;= nums.length &lt;= 10^4</li>
+                                        <li>-10^9 &lt;= nums[i] &lt;= 10^9</li>
+                                        <li>-10^9 &lt;= target &lt;= 10^9</li>
+                                        <li>Only one valid answer exists.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Testcase Manager -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                                <h3 class="text-lg font-bold text-gray-800">3. Testcase Manager</h3>
+                                <button class="px-2 py-0.5 text-xs bg-elegant-blue text-white rounded mobile-tap-target mt-2 sm:mt-0">+ Add Testcase</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <!-- Public Testcase -->
+                                <div class="testcase-card testcase-public bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded">Public</span>
+                                            <span class="text-sm font-medium text-gray-800 ml-2">Example Testcase</span>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="p-1 text-gray-500 hover:text-elegant-blue">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                            <button class="p-1 text-gray-500 hover:text-rose-500">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                                        <div>
+                                            <p class="font-medium text-gray-700">Input:</p>
+                                            <div class="code-editor p-2 mt-1">
+                                                <div class="code-line">nums = [2,7,11,15]</div>
+                                                <div class="code-line">target = 9</div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-700">Expected Output:</p>
+                                            <div class="code-editor p-2 mt-1">
+                                                <div class="code-line">[0,1]</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Hidden Testcase -->
+                                <div class="testcase-card testcase-hidden bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded">Hidden</span>
+                                            <span class="text-sm font-medium text-gray-800 ml-2">Large Input Test</span>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="p-1 text-gray-500 hover:text-elegant-blue">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                            <button class="p-1 text-gray-500 hover:text-rose-500">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                                        <div>
+                                            <p class="font-medium text-gray-700">Input:</p>
+                                            <div class="code-editor p-2 mt-1">
+                                                <div class="code-line">nums = [large array...]</div>
+                                                <div class="code-line">target = 199999</div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-700">Expected Output:</p>
+                                            <div class="code-editor p-2 mt-1">
+                                                <div class="code-line">[423, 876]</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Private Testcase -->
+                                <div class="testcase-card testcase-private bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">Private</span>
+                                            <span class="text-sm font-medium text-gray-800 ml-2">Edge Case</span>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="p-1 text-gray-500 hover:text-elegant-blue">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                            <button class="p-1 text-gray-500 hover:text-rose-500">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                                        <div>
+                                            <p class="font-medium text-gray-700">Input:</p>
+                                            <div class="code-editor p-2 mt-1">
+                                                <div class="code-line">nums = [0,0]</div>
+                                                <div class="code-line">target = 0</div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-700">Expected Output:</p>
+                                            <div class="code-editor p-2 mt-1">
+                                                <div class="code-line">[0,1]</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Constraints & Limits -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                                <h3 class="text-lg font-bold text-gray-800">4. Constraints & Limits</h3>
+                                <button class="px-2 py-0.5 text-xs bg-elegant-teal/10 text-elegant-teal rounded mobile-tap-target mt-2 sm:mt-0">Test Limits</button>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Time Limit (ms)</label>
+                                    <input type="number" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" value="1000" min="100" max="10000">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Memory Limit (MB)</label>
+                                    <input type="number" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" value="256" min="16" max="1024">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Input Constraints</label>
+                                    <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm h-20" placeholder="Describe input constraints...">- 2 <= nums.length <= 10^4
+- -10^9 <= nums[i] <= 10^9
+- -10^9 <= target <= 10^9</textarea>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Output Constraints</label>
+                                    <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm h-20" placeholder="Describe output constraints...">- Return exactly one valid answer
+- Return indices in any order
+- No duplicate elements used</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column - Advanced Controls -->
+                    <div class="space-y-4">
+                        <!-- Scoring Rules -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                                <h3 class="text-lg font-bold text-gray-800">5. Scoring Rules</h3>
+                                <button class="px-2 py-0.5 text-xs bg-elegant-purple/10 text-elegant-purple rounded mobile-tap-target mt-2 sm:mt-0">Configure</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Pass All Testcases</p>
+                                        <p class="text-xs text-gray-600">Full score only if all tests pass</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <label class="feature-flag">
+                                            <input type="checkbox" checked>
+                                            <span class="feature-flag-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Partial Scoring</p>
+                                        <p class="text-xs text-gray-600">Score based on passed testcases</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <label class="feature-flag">
+                                            <input type="checkbox">
+                                            <span class="feature-flag-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Hidden Test Weight</p>
+                                        <p class="text-xs text-gray-600">60% of total score</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-sm font-bold text-gray-800">60%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Difficulty Calibration -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                                <h3 class="text-lg font-bold text-gray-800">6. Difficulty Calibration</h3>
+                                <button class="px-2 py-0.5 text-xs bg-amber-500 text-white rounded mobile-tap-target mt-2 sm:mt-0">Recalibrate</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Current Difficulty</p>
+                                        <p class="text-xs text-gray-600">Based on admin selection</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="difficulty-tag difficulty-easy">Easy</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Suggested Difficulty</p>
+                                        <p class="text-xs text-gray-600">Based on historical data</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="difficulty-tag difficulty-medium">Medium</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Success Rate</p>
+                                        <p class="text-xs text-gray-600">From similar challenges</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-sm font-bold text-green-600">72%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Solution Reference -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                                <h3 class="text-lg font-bold text-gray-800">7. Solution Reference</h3>
+                                <button class="px-2 py-0.5 text-xs bg-elegant-blue/10 text-elegant-blue rounded mobile-tap-target mt-2 sm:mt-0">Add Solution</button>
+                            </div>
+                            
+                            <div class="code-editor text-sm mb-3">
+                                <div class="code-line"><span class="code-comment"># Two Sum - Optimal Solution</span></div>
+                                <div class="code-line"><span class="code-comment"># Time: O(n), Space: O(n)</span></div>
+                                <div class="code-line">&nbsp;</div>
+                                <div class="code-line"><span class="code-keyword">def</span> <span class="code-function">twoSum</span>(nums, target):</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;num_map = {}</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> i, num <span class="code-keyword">in</span> enumerate(nums):</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;complement = target - num</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> complement <span class="code-keyword">in</span> num_map:</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> [num_map[complement], i]</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;num_map[num] = i</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> []</div>
+                            </div>
+                            
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>Complexity: O(n) time, O(n) space</span>
+                                <span>Language: Python</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Hint Bank -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                                <h3 class="text-lg font-bold text-gray-800">8. Hint Bank</h3>
+                                <button class="px-2 py-0.5 text-xs bg-elegant-purple text-white rounded mobile-tap-target mt-2 sm:mt-0">+ Add Hint</button>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <div class="hint-card bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <span class="text-sm font-medium text-gray-800">Hint 1</span>
+                                        <div class="flex space-x-1">
+                                            <button class="p-1 text-gray-500 hover:text-elegant-blue">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                            <button class="p-1 text-gray-500 hover:text-rose-500">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-600">A really brute force way would be to search for all possible pairs of numbers...</p>
+                                </div>
+                                
+                                <div class="hint-card bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <span class="text-sm font-medium text-gray-800">Hint 2</span>
+                                        <div class="flex space-x-1">
+                                            <button class="p-1 text-gray-500 hover:text-elegant-blue">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                            <button class="p-1 text-gray-500 hover:text-rose-500">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-600">So, if we fix one of the numbers, say x, we have to scan the entire array to find the next number...</p>
+                                </div>
+                                
+                                <div class="hint-card bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <span class="text-sm font-medium text-gray-800">Hint 3</span>
+                                        <div class="flex space-x-1">
+                                            <button class="p-1 text-gray-500 hover:text-elegant-blue">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                            <button class="p-1 text-gray-500 hover:text-rose-500">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-600">The second train of thought is, without changing the array, can we use additional space somehow?</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Advanced Features Section -->
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                        <h2 class="text-xl font-bold text-gray-800">Advanced Controls</h2>
+                        <button class="px-3 py-1.5 bg-white border border-elegant-blue text-elegant-blue rounded-lg text-xs flex items-center space-x-1 hover:bg-elegant-blue hover:text-white transition-colors mobile-tap-target mt-2 sm:mt-0">
+                            <i class="fas fa-cogs text-xs"></i>
+                            <span>Advanced Settings</span>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 feature-grid mobile-grid-1 tablet-grid-2 lg:grid-cols-4">
+                        <!-- Content Versioning -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex items-center space-x-2 mb-3 mobile-stack sm:flex-row">
+                                <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center">
+                                    <i class="fas fa-history text-indigo-500"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-sm">9. Content Versioning</h3>
+                                    <p class="text-xs text-gray-500">Track changes</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-3">View and restore previous versions</p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Versions</span>
+                                    <span class="font-medium">5</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Last Change</span>
+                                    <span class="font-medium">2h ago</span>
+                                </div>
+                            </div>
+                            <button class="w-full mt-3 py-1.5 bg-indigo-500 text-white rounded-lg text-xs font-medium mobile-tap-target">View History</button>
+                        </div>
+                        
+                        <!-- Plagiarism Detection -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex items-center space-x-2 mb-3 mobile-stack sm:flex-row">
+                                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center">
+                                    <i class="fas fa-fingerprint text-rose-500"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-sm">10. Plagiarism Detection</h3>
+                                    <p class="text-xs text-gray-500">Solution hashing</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-3">Compare submissions to known solutions</p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Flagged</span>
+                                    <span class="font-medium text-rose-600">12</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Last Scan</span>
+                                    <span class="font-medium">15 min ago</span>
+                                </div>
+                            </div>
+                            <button class="w-full mt-3 py-1.5 bg-rose-500 text-white rounded-lg text-xs font-medium mobile-tap-target">Configure</button>
+                        </div>
+                        
+                        <!-- Language Support -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex items-center space-x-2 mb-3 mobile-stack sm:flex-row">
+                                <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center">
+                                    <i class="fas fa-code text-amber-500"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-sm">11. Language Support</h3>
+                                    <p class="text-xs text-gray-500">Allowed languages</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-3">Configure supported languages</p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Enabled</span>
+                                    <span class="font-medium">8</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Default</span>
+                                    <span class="font-medium">Python</span>
+                                </div>
+                            </div>
+                            <button class="w-full mt-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-medium mobile-tap-target">Manage</button>
+                        </div>
+                        
+                        <!-- Visibility Control -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                            <div class="flex items-center space-x-2 mb-3 mobile-stack sm:flex-row">
+                                <div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center">
+                                    <i class="fas fa-eye text-teal-500"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-sm">12. Visibility Control</h3>
+                                    <p class="text-xs text-gray-500">Publish settings</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-3">Control challenge visibility</p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Status</span>
+                                    <span class="font-medium text-green-600">Published</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Scheduled</span>
+                                    <span class="font-medium">No</span>
+                                </div>
+                            </div>
+                            <button class="w-full mt-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-medium mobile-tap-target">Settings</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Challenge Features -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 mobile-grid-1 tablet-grid-2 lg:grid-cols-3">
+                    <!-- Curriculum Mapping -->
+                    <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                        <div class="flex justify-between items-center mb-3 mobile-stack sm:flex-row">
+                            <h3 class="text-lg font-bold text-gray-800">13. Curriculum Mapping</h3>
+                            <button class="px-2 py-0.5 text-xs bg-elegant-blue/10 text-elegant-blue rounded mobile-tap-target mt-2 sm:mt-0">Map</button>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center p-2 bg-white rounded border border-gray-100">
+                                <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center mr-2">
+                                    <i class="fas fa-book text-elegant-blue text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Algorithms Fundamentals</p>
+                                    <p class="text-xs text-gray-600">Week 2: Arrays & Hashing</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-2 bg-white rounded border border-gray-100">
+                                <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center mr-2">
+                                    <i class="fas fa-project-diagram text-green-500 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Data Structures</p>
+                                    <p class="text-xs text-gray-600">Hash Maps & Sets</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estimated Solve Time -->
+                    <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                        <div class="flex justify-between items-center mb-3 mobile-stack sm:flex-row">
+                            <h3 class="text-lg font-bold text-gray-800">14. Estimated Solve Time</h3>
+                            <button class="px-2 py-0.5 text-xs bg-elegant-purple/10 text-elegant-purple rounded mobile-tap-target mt-2 sm:mt-0">Recalculate</button>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Admin Estimate</p>
+                                    <p class="text-xs text-gray-600">Manual time estimate</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-bold text-gray-800">15-25 min</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Auto Estimate</p>
+                                    <p class="text-xs text-gray-600">Based on similar challenges</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-bold text-gray-800">18-30 min</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-100">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Actual Average</p>
+                                    <p class="text-xs text-gray-600">From student data</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-bold text-green-600">22 min</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="glass rounded-xl p-4 card-hover compact-card mobile-compact">
+                        <div class="flex justify-between items-center mb-3 mobile-stack sm:flex-row">
+                            <h3 class="text-lg font-bold text-gray-800">Additional Features</h3>
+                            <button class="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded mobile-tap-target mt-2 sm:mt-0">View All</button>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <button class="w-full p-3 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center space-x-3 hover:bg-gray-50 transition-colors mobile-tap-target">
+                                <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                                    <i class="fas fa-tags text-elegant-blue text-sm"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-medium text-gray-800">15. Tagging System</p>
+                                    <p class="text-xs text-gray-500">Algorithm, DS, SQL categories</p>
+                                </div>
+                            </button>
+                            
+                            <button class="w-full p-3 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center space-x-3 hover:bg-gray-50 transition-colors mobile-tap-target">
+                                <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
+                                    <i class="fas fa-file-export text-green-500 text-sm"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-medium text-gray-800">16. Bulk Import/Export</p>
+                                    <p class="text-xs text-gray-500">CSV/JSON format</p>
+                                </div>
+                            </button>
+                            
+                            <button class="w-full p-3 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center space-x-3 hover:bg-gray-50 transition-colors mobile-tap-target">
+                                <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center">
+                                    <i class="fas fa-play-circle text-elegant-purple text-sm"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-medium text-gray-800">17. Test Runner</p>
+                                    <p class="text-xs text-gray-500">Queue-based execution</p>
+                                </div>
+                            </button>
+                            
+                            <button class="w-full p-3 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center space-x-3 hover:bg-gray-50 transition-colors mobile-tap-target">
+                                <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
+                                    <i class="fas fa-clipboard-list text-amber-500 text-sm"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-medium text-gray-800">18. Moderation Queue</p>
+                                    <p class="text-xs text-gray-500">Review before publishing</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Final Controls -->
+                <div class="glass rounded-xl p-4 card-hover compact-card mb-4 mobile-compact">
+                    <div class="flex justify-between items-center mb-4 mobile-stack sm:flex-row">
+                        <h3 class="text-lg font-bold text-gray-800">Save & Publish</h3>
+                        <div class="flex space-x-2 mt-2 sm:mt-0">
+                            <button class="px-3 py-1.5 bg-elegant-blue text-white rounded-lg text-xs font-medium mobile-tap-target">Save Draft</button>
+                            <button class="px-3 py-1.5 bg-elegant-purple text-white rounded-lg text-xs font-medium mobile-tap-target">Publish</button>
+                            <button class="px-3 py-1.5 bg-white border border-rose-500 text-rose-500 rounded-lg text-xs font-medium mobile-tap-target">Preview as Student</button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                            <div>
+                                <p class="text-sm font-medium text-blue-800">Challenge Ready for Review</p>
+                                <p class="text-xs text-blue-700">All required fields completed. Test cases validated. Ready for publishing or further review.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Floating AI Assistant -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <button class="w-12 h-12 rounded-full bg-gradient-to-r from-elegant-blue to-elegant-purple flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow text-white floating-element mobile-tap-target">
+            <i class="fas fa-robot"></i>
+        </button>
+    </div>
+
+    <script>
+        // Initialize functionality when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            document.querySelectorAll('.tab-button').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and contents
+                    document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+                });
+            });
+            
+            // Button actions
+            document.getElementById('new-challenge-btn').addEventListener('click', function() {
+                alert('Opening new challenge form...');
+            });
+            
+            document.getElementById('import-challenges-btn').addEventListener('click', function() {
+                alert('Opening import dialog...');
+            });
+            
+            document.getElementById('moderation-queue-btn').addEventListener('click', function() {
+                alert('Opening moderation queue...');
+            });
+            
+            document.getElementById('preview-challenge-btn').addEventListener('click', function() {
+                alert('Opening student preview...');
+            });
+            
+            // File upload drag and drop
+            const uploadArea = document.querySelector('.upload-area');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+                
+                uploadArea.addEventListener('dragleave', function() {
+                    this.classList.remove('dragover');
+                });
+                
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    alert('Files uploaded successfully!');
+                });
+            }
+            
+            // Test case management
+            document.querySelectorAll('.testcase-card .fa-trash').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete this test case?')) {
+                        this.closest('.testcase-card').remove();
+                    }
+                });
+            });
+            
+            // Hint management
+            document.querySelectorAll('.hint-card .fa-trash').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete this hint?')) {
+                        this.closest('.hint-card').remove();
+                    }
+                });
+            });
+            
+            // Difficulty calibration
+            document.querySelector('[class*="bg-amber-500"]').addEventListener('click', function() {
+                alert('Recalibrating difficulty based on historical data...');
+                // In a real app, this would call an API to recalculate difficulty
+            });
+            
+            // Simulate live updates
+            setInterval(() => {
+                // Update any live data indicators
+                const liveIndicators = document.querySelectorAll('.live-indicator');
+                liveIndicators.forEach(indicator => {
+                    indicator.style.animation = 'none';
+                    setTimeout(() => {
+                        indicator.style.animation = 'pulse-soft 1.5s infinite';
+                    }, 10);
+                });
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

@@ -28,7 +28,7 @@ router.beforeEach((to, from, next) => {
   to.meta.layoutName = layout;
 
   // Optional guard: prevent logged-in users from revisiting /login or /register
- // const isAuthenticated = !!localStorage.getItem('access_token');
+  // const isAuthenticated = !!localStorage.getItem('access_token');
   //if (to.meta.guestOnly && isAuthenticated) {
   //  return next('/');
   //}

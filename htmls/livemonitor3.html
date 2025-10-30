@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeMentorAI - Live Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        elegant: {
+                            blue: '#3b82f6',
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            teal: '#14b8a6',
+                            amber: '#f59e0b',
+                            gray: '#6b7280',
+                            indigo: '#6366f1',
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            rose: '#f43f5e'
+                        }
+                    },
+                    animation: {
+                        'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-in': 'slide-in 0.5s ease-out',
+                        'bounce-soft': 'bounce-soft 2s infinite',
+                        'gradient-x': 'gradient-x 15s ease infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'typewriter': 'typewriter 4s steps(40) 1s 1 normal both',
+                        'ping-slow': 'ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                        'spin-slow': 'spin-slow 3s linear infinite',
+                        'fade-in-up': 'fade-in-up 0.6s ease-out',
+                        'shimmer': 'shimmer 2s infinite linear'
+                    },
+                    keyframes: {
+                        'pulse-soft': {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.8 }
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        'slide-in': {
+                            '0%': { transform: 'translateX(-100%)', opacity: 0 },
+                            '100%': { transform: 'translateX(0)', opacity: 1 }
+                        },
+                        'bounce-soft': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        },
+                        'gradient-x': {
+                            '0%, 100%': { 'background-position': '0% 50%' },
+                            '50%': { 'background-position': '100% 50%' }
+                        },
+                        'glow': {
+                            'from': { 'box-shadow': '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #3b82f6, 0 0 20px #3b82f6' },
+                            'to': { 'box-shadow': '0 0 10px #fff, 0 0 15px #3b82f6, 0 0 20px #3b82f6, 0 0 25px #3b82f6' }
+                        },
+                        'wiggle': {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' }
+                        },
+                        'typewriter': {
+                            'from': { width: '0' },
+                            'to': { width: '100%' }
+                        },
+                        'ping-slow': {
+                            '75%, 100%': {
+                                transform: 'scale(2)',
+                                opacity: '0'
+                            }
+                        },
+                        'spin-slow': {
+                            'from': { transform: 'rotate(0deg)' },
+                            'to': { transform: 'rotate(360deg)' }
+                        },
+                        'fade-in-up': {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(30px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        },
+                        'shimmer': {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        
+        .ai-avatar {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .xp-progress {
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        .xp-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: width 0.5s ease;
+        }
+        
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+        
+        .mobile-menu {
+            display: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: flex;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .chart-container {
+                height: 200px !important;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .stat-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .main-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .activity-feed {
+                max-height: 300px !important;
+            }
+        }
+        
+        .compact-card {
+            padding: 1rem !important;
+        }
+        
+        .dense-grid {
+            gap: 1rem !important;
+        }
+        
+        .no-white-space {
+            margin: 0;
+            padding: 0.5rem;
+        }
+        
+        .session-item {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .session-item:hover, .session-item.active {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .session-active {
+            border-left-color: #10b981;
+        }
+        
+        .session-flagged {
+            border-left-color: #ef4444;
+        }
+        
+        .session-help {
+            border-left-color: #f59e0b;
+        }
+        
+        .session-private {
+            border-left-color: #6b7280;
+        }
+        
+        .confidence-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .status-online {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+        
+        .status-busy {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+        
+        .status-help {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+        
+        .status-offline {
+            background: linear-gradient(90deg, #6b7280, #9ca3af);
+        }
+        
+        .activity-tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-coding {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+        }
+        
+        .activity-reading {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .activity-chatting {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        
+        .activity-help {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        .chat-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .chat-bubble-user {
+            background: #e0f2fe;
+            border-bottom-right-radius: 0.25rem;
+            margin-left: auto;
+        }
+        
+        .chat-bubble-ai {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .chat-bubble-admin {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .code-playground {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            color: #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .code-line {
+            margin-bottom: 0.25rem;
+        }
+        
+        .code-keyword {
+            color: #f472b6;
+        }
+        
+        .code-function {
+            color: #60a5fa;
+        }
+        
+        .code-string {
+            color: #34d399;
+        }
+        
+        .code-comment {
+            color: #94a3b8;
+        }
+        
+        .diff-added {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 2px solid #10b981;
+            padding-left: 0.5rem;
+        }
+        
+        .diff-removed {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 2px solid #ef4444;
+            padding-left: 0.5rem;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .live-pulse {
+            animation: pulse-soft 2s infinite;
+        }
+        
+        .time-travel-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            outline: none;
+        }
+        
+        .time-travel-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .time-travel-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse-soft 2s infinite;
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen overflow-x-hidden no-white-space">
+    <!-- Mobile Header -->
+    <div class="mobile-menu glass border-b border-gray-200 p-3 flex justify-between items-center lg:hidden">
+        <div class="flex items-center space-x-3">
+            <div class="ai-avatar w-10 h-10">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold gradient-text">CodeMentorAI</h1>
+            </div>
+        </div>
+        <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" id="mobile-menu-button">
+            <i class="fas fa-bars text-elegant-gray"></i>
+        </button>
+    </div>
+
+    <div class="flex h-screen">
+        <!-- Main Content -->
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
+            <!-- Enhanced Top Bar -->
+            <header class="glass border-b border-gray-200 p-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                        <span class="hidden sm:inline">Live Monitor</span>
+                        <span class="live-indicator ml-2">LIVE</span>
+                    </h2>
+                    <div class="relative hidden md:block">
+                        <input type="text" placeholder="Search active sessions..." class="bg-white border border-gray-300 rounded-lg pl-9 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-elegant-blue/50 w-64 text-sm">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-elegant-gray text-sm"></i>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <div class="flex space-x-1">
+                        <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors relative">
+                            <i class="fas fa-bell text-elegant-gray text-sm"></i>
+                            <span class="notification-dot" style="top: 4px; right: 4px;"></span>
+                        </button>
+                        <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-comment-alt text-elegant-gray text-sm"></i>
+                        </button>
+                        <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog text-elegant-gray text-sm"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 bg-white rounded-lg p-1.5 border border-gray-200 shadow-sm">
+                        <div class="ai-avatar w-6 h-6">
+                            <span class="text-xs font-bold">A</span>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Admin</span>
+                        <i class="fas fa-chevron-down text-elegant-gray text-xs"></i>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Ultra Compact Live Monitor Content -->
+            <main class="flex-1 overflow-y-auto p-3 dense-grid">
+                <!-- Live Monitor Header & Quick Actions -->
+                <div class="mb-4">
+                    <div class="glass rounded-xl p-4 card-hover compact-card">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                            <div class="flex-1">
+                                <h1 class="text-xl sm:text-2xl font-bold mb-1">Live <span class="gradient-text">Monitor</span> 📡</h1>
+                                <p class="text-xs sm:text-sm text-gray-600 mb-3">Real-time view of active student sessions and interactions.</p>
+                                
+                                <div class="flex flex-wrap gap-1.5 mb-3">
+                                    <div class="flex items-center space-x-1 bg-green-50 text-green-700 px-2 py-1 rounded-full text-xs">
+                                        <div class="online-indicator"></div>
+                                        <span>24 Active Sessions</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 bg-amber-50 text-amber-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-hand-paper text-xs"></i>
+                                        <span>3 Help Requests</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 bg-red-50 text-red-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-flag text-xs"></i>
+                                        <span>2 Flagged Sessions</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-clock text-xs"></i>
+                                        <span>18.4min Avg. Time</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Actions Compact -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center" id="bulk-message-btn">
+                                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-bullhorn text-elegant-blue text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Bulk Message</span>
+                                    </button>
+                                    
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center" id="help-queue-btn">
+                                        <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-hand-paper text-elegant-purple text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Help Queue</span>
+                                    </button>
+                                    
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center" id="recordings-btn">
+                                        <div class="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-record-vinyl text-elegant-pink text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Recordings</span>
+                                    </button>
+                                    
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center" id="export-btn">
+                                        <div class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-download text-elegant-teal text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Export</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Stats Grid - Ultra Compact -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4 stat-grid">
+                    <div class="stat-card rounded-lg p-3 card-hover compact-card">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-elegant-gray text-xs">Active Sessions</p>
+                                <p class="text-lg font-bold mt-0.5 text-gray-800">24</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
+                                <i class="fas fa-users text-green-500 text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1 flex items-center text-green-500 text-xs">
+                            <i class="fas fa-arrow-up mr-0.5"></i>
+                            <span>3 new in last 5min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card rounded-lg p-3 card-hover compact-card">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-elegant-gray text-xs">Help Requests</p>
+                                <p class="text-lg font-bold mt-0.5 text-gray-800">3</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
+                                <i class="fas fa-hand-paper text-amber-500 text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1 flex items-center text-amber-500 text-xs">
+                            <i class="fas fa-clock mr-0.5"></i>
+                            <span>Oldest: 4min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card rounded-lg p-3 card-hover compact-card">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-elegant-gray text-xs">Avg. Session Time</p>
+                                <p class="text-lg font-bold mt-0.5 text-gray-800">18.4min</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                                <i class="fas fa-clock text-elegant-blue text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1 flex items-center text-green-500 text-xs">
+                            <i class="fas fa-arrow-up mr-0.5"></i>
+                            <span>+2.3min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card rounded-lg p-3 card-hover compact-card">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-elegant-gray text-xs">Flagged Sessions</p>
+                                <p class="text-lg font-bold mt-0.5 text-gray-800">2</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
+                                <i class="fas fa-flag text-red-500 text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1 flex items-center text-red-500 text-xs">
+                            <i class="fas fa-arrow-up mr-0.5"></i>
+                            <span>1 new</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Live Monitor Grid -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-4 main-grid">
+                    <!-- Active Sessions & Help Queue -->
+                    <div class="xl:col-span-2 space-y-4">
+                        <!-- Active Sessions -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-800">Active Sessions</h3>
+                                <div class="flex items-center space-x-2">
+                                    <button class="px-2 py-1 text-xs bg-elegant-blue text-white rounded">All</button>
+                                    <button class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">Help</button>
+                                    <button class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">Flagged</button>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 max-h-80 overflow-y-auto pr-1 activity-feed">
+                                <!-- Session 1 - Active with Help -->
+                                <div class="session-item session-help bg-white rounded-lg border border-gray-100 shadow-sm">
+                                    <div class="p-3">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="flex items-center space-x-1">
+                                                    <div class="online-indicator"></div>
+                                                    <span class="text-xs text-gray-500">12:24:45</span>
+                                                </div>
+                                                <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">Help Requested</span>
+                                            </div>
+                                            <div class="flex space-x-1">
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-blue">
+                                                    <i class="fas fa-comment text-xs"></i>
+                                                </button>
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-purple">
+                                                    <i class="fas fa-eye text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                                    <span class="text-xs font-bold text-blue-700">AC</span>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-800">Alex Chen</p>
+                                                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                                        <span>Web Dev Cohort</span>
+                                                        <span>•</span>
+                                                        <span>18 min</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center text-xs">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-code text-gray-400"></i>
+                                                    <span class="text-gray-600">Binary Search Challenge</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-robot text-gray-400"></i>
+                                                    <span class="text-gray-600">Strict Mentor</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="activity-tag activity-help">Help Request</span>
+                                                <span class="activity-tag activity-coding">Coding</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="text-gray-600">Last Activity</span>
+                                                <span class="font-medium">2 min ago</span>
+                                            </div>
+                                            <div class="confidence-bar">
+                                                <div class="confidence-fill status-help" style="width: 100%"></div>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-0.5">Waiting for assistance - 4 minutes</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Session 2 - Flagged -->
+                                <div class="session-item session-flagged bg-white rounded-lg border border-gray-100 shadow-sm">
+                                    <div class="p-3">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="flex items-center space-x-1">
+                                                    <div class="online-indicator"></div>
+                                                    <span class="text-xs text-gray-500">12:18:32</span>
+                                                </div>
+                                                <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Flagged</span>
+                                            </div>
+                                            <div class="flex space-x-1">
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-blue">
+                                                    <i class="fas fa-comment text-xs"></i>
+                                                </button>
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-purple">
+                                                    <i class="fas fa-eye text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                                    <span class="text-xs font-bold text-purple-700">MR</span>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-800">Maria Rodriguez</p>
+                                                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                                        <span>Data Science</span>
+                                                        <span>•</span>
+                                                        <span>24 min</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center text-xs">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-code text-gray-400"></i>
+                                                    <span class="text-gray-600">Sorting Algorithms</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-robot text-gray-400"></i>
+                                                    <span class="text-gray-600">Encouraging</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="activity-tag activity-coding">Coding</span>
+                                                <span class="activity-tag">Sentinel Alert</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="text-gray-600">Last Activity</span>
+                                                <span class="font-medium">Just now</span>
+                                            </div>
+                                            <div class="confidence-bar">
+                                                <div class="confidence-fill status-busy" style="width: 100%"></div>
+                                            </div>
+                                            <p class="text-xs text-red-500 mt-0.5">Potential code solution hallucination detected</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Session 3 - Active -->
+                                <div class="session-item session-active bg-white rounded-lg border border-gray-100 shadow-sm">
+                                    <div class="p-3">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="flex items-center space-x-1">
+                                                    <div class="online-indicator"></div>
+                                                    <span class="text-xs text-gray-500">12:15:18</span>
+                                                </div>
+                                                <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Active</span>
+                                            </div>
+                                            <div class="flex space-x-1">
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-blue">
+                                                    <i class="fas fa-comment text-xs"></i>
+                                                </button>
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-purple">
+                                                    <i class="fas fa-eye text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                                    <span class="text-xs font-bold text-green-700">JW</span>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-800">James Wilson</p>
+                                                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                                        <span>Bootcamp Alpha</span>
+                                                        <span>•</span>
+                                                        <span>32 min</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center text-xs">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-code text-gray-400"></i>
+                                                    <span class="text-gray-600">CSS Layout Challenge</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-robot text-gray-400"></i>
+                                                    <span class="text-gray-600">Encouraging</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="activity-tag activity-coding">Coding</span>
+                                                <span class="activity-tag">Good Progress</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="text-gray-600">Last Activity</span>
+                                                <span class="font-medium">45 sec ago</span>
+                                            </div>
+                                            <div class="confidence-bar">
+                                                <div class="confidence-fill status-online" style="width: 100%"></div>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-0.5">Working on flexbox implementation</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Session 4 - Private -->
+                                <div class="session-item session-private bg-white rounded-lg border border-gray-100 shadow-sm">
+                                    <div class="p-3">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="flex items-center space-x-1">
+                                                    <div class="online-indicator"></div>
+                                                    <span class="text-xs text-gray-500">12:08:55</span>
+                                                </div>
+                                                <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">Private</span>
+                                            </div>
+                                            <div class="flex space-x-1">
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-blue">
+                                                    <i class="fas fa-lock text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                                                    <span class="text-xs font-bold text-gray-700">SK</span>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-800">Sophie Kim</p>
+                                                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                                        <span>Advanced Algorithms</span>
+                                                        <span>•</span>
+                                                        <span>15 min</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center text-xs">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-code text-gray-400"></i>
+                                                    <span class="text-gray-600">Dynamic Programming</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-robot text-gray-400"></i>
+                                                    <span class="text-gray-600">Strict Mentor</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="activity-tag activity-chatting">Chatting</span>
+                                                <span class="activity-tag">Privacy Enabled</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="text-gray-600">Last Activity</span>
+                                                <span class="font-medium">3 min ago</span>
+                                            </div>
+                                            <div class="confidence-bar">
+                                                <div class="confidence-fill status-offline" style="width: 100%"></div>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-0.5">Privacy settings limit visibility</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-3 border-t border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-medium text-gray-700">Live Updates</span>
+                                    <span class="text-xs text-gray-500">Last refresh: Just now</span>
+                                </div>
+                                <div class="xp-progress mt-1">
+                                    <div class="xp-progress-fill" style="width: 100%"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-0.5">Real-time data streaming active</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Session Detail View -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-800">Session Details</h3>
+                                <div class="flex items-center space-x-2">
+                                    <button class="px-2 py-1 text-xs bg-elegant-blue text-white rounded">Assist</button>
+                                    <button class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">Record</button>
+                                    <button class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded">End Session</button>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <!-- Student Profile & Session Info -->
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                                <span class="text-sm font-bold text-blue-700">AC</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-lg font-bold text-gray-800">Alex Chen</p>
+                                                <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                                    <span>Web Dev Cohort</span>
+                                                    <span>•</span>
+                                                    <span>Level 3</span>
+                                                    <span>•</span>
+                                                    <span class="text-green-500">18.2min active</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm font-medium text-gray-800">Binary Search Challenge</p>
+                                            <p class="text-xs text-gray-500">Difficulty: Medium</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                                        <div class="text-center">
+                                            <p class="font-medium text-gray-800">Solve Rate</p>
+                                            <p class="text-green-500">72%</p>
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="font-medium text-gray-800">Avg. Time</p>
+                                            <p class="text-gray-600">14.2min</p>
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="font-medium text-gray-800">Attempts</p>
+                                            <p class="text-gray-600">3</p>
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="font-medium text-gray-800">AI Tutor</p>
+                                            <p class="text-gray-600">Strict Mentor</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Live Chat Transcript -->
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <label class="text-xs font-medium text-gray-700 mb-2 block">Live Chat Transcript</label>
+                                    
+                                    <div class="space-y-2 max-h-40 overflow-y-auto">
+                                        <!-- User Message -->
+                                        <div class="chat-bubble chat-bubble-user">
+                                            <p class="text-sm">I'm stuck on implementing the binary search algorithm. My code keeps returning -1 even when the element exists.</p>
+                                            <p class="text-xs text-gray-500 mt-1">Alex • 12:22:18</p>
+                                        </div>
+                                        
+                                        <!-- AI Response -->
+                                        <div class="chat-bubble chat-bubble-ai">
+                                            <p class="text-sm">Let me check your implementation. Can you show me your current code?</p>
+                                            <p class="text-xs text-gray-500 mt-1">AI Tutor • 12:22:23</p>
+                                        </div>
+                                        
+                                        <!-- User Message -->
+                                        <div class="chat-bubble chat-bubble-user">
+                                            <p class="text-sm">Here's what I have:</p>
+                                            <div class="code-playground text-xs mt-1">
+                                                <div class="code-line"><span class="code-keyword">def</span> <span class="code-function">binary_search</span>(arr, target):</div>
+                                                <div class="code-line">&nbsp;&nbsp;left, right = 0, <span class="code-function">len</span>(arr)</div>
+                                                <div class="code-line">&nbsp;&nbsp;<span class="code-keyword">while</span> left < right:</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;mid = (left + right) // 2</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> arr[mid] == target:</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> mid</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">elif</span> arr[mid] < target:</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left = mid</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">else</span>:</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;right = mid</div>
+                                                <div class="code-line">&nbsp;&nbsp;<span class="code-keyword">return</span> -1</div>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1">Alex • 12:23:05</p>
+                                        </div>
+                                        
+                                        <!-- AI Response -->
+                                        <div class="chat-bubble chat-bubble-ai">
+                                            <p class="text-sm">I see the issue. Your bounds adjustment is incorrect. When arr[mid] < target, you should set left = mid + 1, not left = mid.</p>
+                                            <p class="text-xs text-gray-500 mt-1">AI Tutor • 12:23:42</p>
+                                        </div>
+                                        
+                                        <!-- Help Request -->
+                                        <div class="chat-bubble chat-bubble-user">
+                                            <div class="flex items-center space-x-2">
+                                                <i class="fas fa-hand-paper text-amber-500"></i>
+                                                <p class="text-sm font-medium text-amber-700">Help requested - waiting for assistance</p>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1">Alex • 12:24:45</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Admin Assist Input -->
+                                    <div class="mt-3 flex space-x-2">
+                                        <input type="text" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-elegant-blue" placeholder="Send assistance message...">
+                                        <button class="px-3 py-2 bg-elegant-blue text-white rounded-lg text-sm font-medium">Send</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Live Code Viewer -->
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="text-xs font-medium text-gray-700">Live Code Viewer</label>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs text-gray-500">Last update: 45s ago</span>
+                                            <button class="p-1 text-elegant-gray hover:text-elegant-blue">
+                                                <i class="fas fa-sync-alt text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-playground">
+                                        <div class="code-line"><span class="code-keyword">def</span> <span class="code-function">binary_search</span>(arr, target):</div>
+                                        <div class="code-line">&nbsp;&nbsp;left, right = 0, <span class="code-function">len</span>(arr)</div>
+                                        <div class="code-line">&nbsp;&nbsp;<span class="code-keyword">while</span> left < right:</div>
+                                        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;mid = (left + right) // 2</div>
+                                        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> arr[mid] == target:</div>
+                                        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> mid</div>
+                                        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">elif</span> arr[mid] < target:</div>
+                                        <div class="code-line diff-removed">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left = mid</div>
+                                        <div class="code-line diff-added">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left = mid + 1</div>
+                                        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">else</span>:</div>
+                                        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;right = mid</div>
+                                        <div class="code-line">&nbsp;&nbsp;<span class="code-keyword">return</span> -1</div>
+                                    </div>
+                                    
+                                    <!-- Time Travel Diffs -->
+                                    <div class="mt-3">
+                                        <label class="text-xs font-medium text-gray-700 mb-2 block">Time Travel - Code Changes</label>
+                                        <input type="range" min="0" max="100" value="75" class="time-travel-slider w-full">
+                                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                            <span>12:15:00</span>
+                                            <span>12:23:05 (Current)</span>
+                                        </div>
+                                        <div class="mt-2 text-xs text-gray-600">
+                                            <p>Changes in the last 8 minutes:</p>
+                                            <ul class="list-disc list-inside mt-1">
+                                                <li>Fixed bounds adjustment in line 7</li>
+                                                <li>Added mid calculation</li>
+                                                <li>Initial implementation at 12:15</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Sidebar - Monitoring Tools -->
+                    <div class="space-y-4">
+                        <!-- Help Queue -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-800">Help Queue</h3>
+                                <button class="px-2 py-1 text-xs bg-elegant-teal/10 text-elegant-teal rounded">Assign All</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <span class="text-xs font-bold text-blue-700">AC</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Alex Chen</p>
+                                            <p class="text-xs text-gray-500">Binary Search • 4min wait</p>
+                                        </div>
+                                        <div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                                    </div>
+                                    <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                        <span>Bounds adjustment issue</span>
+                                        <button class="text-elegant-blue">Assist</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                            <span class="text-xs font-bold text-purple-700">MR</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Maria Rodriguez</p>
+                                            <p class="text-xs text-gray-500">Sorting • 2min wait</p>
+                                        </div>
+                                        <div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                                    </div>
+                                    <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                        <span>Algorithm complexity</span>
+                                        <button class="text-elegant-blue">Assist</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                            <span class="text-xs font-bold text-green-700">JW</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">James Wilson</p>
+                                            <p class="text-xs text-gray-500">CSS Layout • 1min wait</p>
+                                        </div>
+                                        <div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                                    </div>
+                                    <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                        <span>Flexbox alignment</span>
+                                        <button class="text-elegant-blue">Assist</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-3 border-t border-gray-200">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Queue Status</span>
+                                    <span class="text-gray-500">3 requests, 4min avg wait</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Session Controls -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold text-gray-800">Session Controls</h3>
+                                <button class="px-2 py-1 text-xs bg-elegant-purple/10 text-elegant-purple rounded">Settings</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-gray-700">Recording</span>
+                                        <label class="feature-flag">
+                                            <input type="checkbox" checked>
+                                            <span class="feature-flag-slider"></span>
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Record text + code diffs</p>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-gray-700">Follow Session</span>
+                                        <label class="feature-flag">
+                                            <input type="checkbox">
+                                            <span class="feature-flag-slider"></span>
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Get notifications for activity</p>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-gray-700">Moderator</span>
+                                        <span class="text-xs font-bold text-gray-800">Unassigned</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Assign staff member</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button class="w-full py-1.5 bg-gradient-to-r from-elegant-purple to-elegant-pink rounded-lg text-xs font-medium flex items-center justify-center space-x-1 text-white">
+                                    <i class="fas fa-user-shield text-xs"></i>
+                                    <span>Assign Moderator</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Coaching Notes -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold text-gray-800">Coaching Notes</h3>
+                                <button class="px-2 py-1 text-xs bg-elegant-pink/10 text-elegant-pink rounded">Add Note</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <i class="fas fa-user text-blue-500 text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Admin Note</p>
+                                            <p class="text-xs text-gray-500">Student struggles with algorithm bounds</p>
+                                        </div>
+                                        <span class="text-xs text-gray-400">2h ago</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                            <i class="fas fa-user text-green-500 text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Teacher Note</p>
+                                            <p class="text-xs text-gray-500">Good progress on previous challenges</p>
+                                        </div>
+                                        <span class="text-xs text-gray-400">1d ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-elegant-blue" rows="2" placeholder="Add private coaching note..."></textarea>
+                                <button class="w-full mt-2 py-1.5 bg-gradient-to-r from-elegant-amber to-elegant-rose rounded-lg text-xs font-medium flex items-center justify-center space-x-1 text-white">
+                                    <i class="fas fa-plus text-xs"></i>
+                                    <span>Save Note</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Bulk Messaging -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold text-gray-800">Bulk Messaging</h3>
+                                <button class="px-2 py-1 text-xs bg-elegant-cyan/10 text-elegant-cyan rounded">Send</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs font-medium text-gray-700 mb-1 block">Recipients</label>
+                                    <select class="w-full border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-elegant-blue">
+                                        <option>All Active Sessions (24)</option>
+                                        <option>Help Queue Only (3)</option>
+                                        <option>Flagged Sessions (2)</option>
+                                        <option>Web Dev Cohort (8)</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs font-medium text-gray-700 mb-1 block">Message</label>
+                                    <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-elegant-blue" rows="2" placeholder="Enter broadcast message...">Reminder: Weekly office hours tomorrow at 2 PM. Bring your questions!</textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 pt-3 border-t border-gray-200">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Last Broadcast</span>
+                                    <span class="text-gray-500">2 hours ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Live Metrics -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                    <!-- Session Analytics -->
+                    <div class="glass rounded-xl p-4 card-hover compact-card lg:col-span-2">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-bold text-gray-800">Session Analytics</h3>
+                            <div class="flex space-x-1">
+                                <button class="px-2 py-0.5 text-xs bg-elegant-blue text-white rounded">1H</button>
+                                <button class="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded">24H</button>
+                            </div>
+                        </div>
+                        <div class="h-40 chart-container">
+                            <canvas id="sessionsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Distribution -->
+                    <div class="glass rounded-xl p-4 card-hover compact-card">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-bold text-gray-800">Activity Distribution</h3>
+                            <button class="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded">Details</button>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                    <i class="fas fa-code text-purple-500 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-800">Coding</p>
+                                    <p class="text-xs text-gray-600">16 students</p>
+                                    <div class="flex items-center space-x-1.5 mt-1">
+                                        <span class="text-xs text-gray-500">67%</span>
+                                        <div class="xp-progress flex-1">
+                                            <div class="xp-progress-fill" style="width: 67%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3 p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                                    <i class="fas fa-comments text-amber-500 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-800">Chatting</p>
+                                    <p class="text-xs text-gray-600">5 students</p>
+                                    <div class="flex items-center space-x-1.5 mt-1">
+                                        <span class="text-xs text-gray-500">21%</span>
+                                        <div class="xp-progress flex-1">
+                                            <div class="xp-progress-fill bg-amber-500" style="width: 21%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monitor Controls -->
+                <div class="glass rounded-xl p-4 card-hover compact-card mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Monitor Controls</h3>
+                        <button class="px-3 py-1.5 bg-elegant-blue text-white rounded-lg text-xs font-medium">Save Settings</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-800">Auto-Recording</span>
+                                <label class="feature-flag">
+                                    <input type="checkbox" checked>
+                                    <span class="feature-flag-slider"></span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500">Record all sessions by default</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-800">Flag Alerts</span>
+                                <label class="feature-flag">
+                                    <input type="checkbox" checked>
+                                    <span class="feature-flag-slider"></span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500">Notify on sentinel flags</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-800">Help Queue Alerts</span>
+                                <label class="feature-flag">
+                                    <input type="checkbox" checked>
+                                    <span class="feature-flag-slider"></span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500">Notify on new help requests</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Floating AI Assistant -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <button class="w-12 h-12 rounded-full bg-gradient-to-r from-elegant-blue to-elegant-purple flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow text-white floating-element">
+            <i class="fas fa-robot"></i>
+        </button>
+    </div>
+
+    <script>
+        // Initialize charts when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Session Analytics Chart
+            const sessionsCtx = document.getElementById('sessionsChart').getContext('2d');
+            const sessionsChart = new Chart(sessionsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30'],
+                    datasets: [
+                        {
+                            label: 'Active Sessions',
+                            data: [18, 22, 24, 26, 24, 22, 20],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Help Requests',
+                            data: [2, 3, 2, 4, 3, 2, 1],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Flagged Sessions',
+                            data: [1, 0, 1, 2, 1, 1, 0],
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                font: {
+                                    size: 9
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 9
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-button').addEventListener('click', function() {
+                // This would toggle the sidebar if it was included
+                // For now, we'll just show an alert since the sidebar isn't in this code
+                alert('Sidebar toggle would appear here. In the full implementation, this would show/hide the navigation sidebar.');
+            });
+            
+            // Add interactivity to session items
+            document.querySelectorAll('.session-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on action buttons
+                    if (!e.target.closest('button')) {
+                        document.querySelectorAll('.session-item').forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // In a real implementation, this would load the selected session details
+                        alert('Selected session details would load here with live chat, code, and controls.');
+                    }
+                });
+            });
+            
+            // Quick action buttons
+            document.getElementById('bulk-message-btn').addEventListener('click', function() {
+                alert('Bulk messaging interface would open with options to send broadcast messages to selected users.');
+            });
+            
+            document.getElementById('help-queue-btn').addEventListener('click', function() {
+                alert('Help queue management interface would open with assignment and prioritization tools.');
+            });
+            
+            document.getElementById('recordings-btn').addEventListener('click', function() {
+                alert('Session recordings dashboard would open with searchable transcripts and code diffs.');
+            });
+            
+            document.getElementById('export-btn').addEventListener('click', function() {
+                alert('Export interface would open with options to download session data and analytics.');
+            });
+            
+            // Time travel slider functionality
+            document.querySelectorAll('.time-travel-slider').forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const value = this.value;
+                    const labels = this.parentElement.querySelectorAll('.text-xs.text-gray-500');
+                    if (labels.length >= 2) {
+                        // Update the current time based on slider position
+                        const currentTime = new Date();
+                        currentTime.setMinutes(currentTime.getMinutes() - (100 - value));
+                        labels[1].textContent = currentTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    }
+                });
+            });
+            
+            // Simulate live updates for active sessions
+            setInterval(() => {
+                // Update session timers
+                document.querySelectorAll('.session-item').forEach(session => {
+                    const timeElement = session.querySelector('.text-gray-500');
+                    if (timeElement && timeElement.textContent.includes('min')) {
+                        const timeMatch = timeElement.textContent.match(/(\d+) min/);
+                        if (timeMatch) {
+                            const currentTime = parseInt(timeMatch[1]);
+                            timeElement.textContent = timeElement.textContent.replace(/(\d+) min/, (currentTime + 1) + ' min');
+                        }
+                    }
+                    
+                    // Update last activity times
+                    const activityElement = session.querySelector('.font-medium');
+                    if (activityElement && activityElement.textContent.includes('sec')) {
+                        const secMatch = activityElement.textContent.match(/(\d+) sec/);
+                        if (secMatch) {
+                            const currentSec = parseInt(secMatch[1]);
+                            if (currentSec < 59) {
+                                activityElement.textContent = activityElement.textContent.replace(/(\d+) sec/, (currentSec + 1) + ' sec');
+                            } else {
+                                activityElement.textContent = '1 min ago';
+                            }
+                        }
+                    }
+                });
+                
+                // Randomly add/remove sessions to simulate live activity
+                if (Math.random() > 0.7) {
+                    const sessionsFeed = document.querySelector('.activity-feed');
+                    if (sessionsFeed && sessionsFeed.children.length > 0) {
+                        // Remove a random session occasionally
+                        if (Math.random() > 0.8 && sessionsFeed.children.length > 3) {
+                            const randomIndex = Math.floor(Math.random() * sessionsFeed.children.length);
+                            sessionsFeed.children[randomIndex].remove();
+                        }
+                    }
+                }
+            }, 1000);
+            
+            // Feature flag toggles
+            document.querySelectorAll('.feature-flag input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const parent = this.closest('.bg-white');
+                    if (this.checked) {
+                        parent.classList.add('border-green-200', 'bg-green-50');
+                    } else {
+                        parent.classList.remove('border-green-200', 'bg-green-50');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

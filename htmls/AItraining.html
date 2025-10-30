@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeMentorAI - AI Training</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        elegant: {
+                            blue: '#3b82f6',
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            teal: '#14b8a6',
+                            amber: '#f59e0b',
+                            gray: '#6b7280',
+                            indigo: '#6366f1',
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            rose: '#f43f5e'
+                        }
+                    },
+                    animation: {
+                        'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-in': 'slide-in 0.5s ease-out',
+                        'bounce-soft': 'bounce-soft 2s infinite',
+                        'gradient-x': 'gradient-x 15s ease infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'typewriter': 'typewriter 4s steps(40) 1s 1 normal both',
+                        'ping-slow': 'ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                        'spin-slow': 'spin-slow 3s linear infinite',
+                        'fade-in-up': 'fade-in-up 0.6s ease-out',
+                        'shimmer': 'shimmer 2s infinite linear'
+                    },
+                    keyframes: {
+                        'pulse-soft': {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.8 }
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        'slide-in': {
+                            '0%': { transform: 'translateX(-100%)', opacity: 0 },
+                            '100%': { transform: 'translateX(0)', opacity: 1 }
+                        },
+                        'bounce-soft': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        },
+                        'gradient-x': {
+                            '0%, 100%': { 'background-position': '0% 50%' },
+                            '50%': { 'background-position': '100% 50%' }
+                        },
+                        'glow': {
+                            'from': { 'box-shadow': '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #3b82f6, 0 0 20px #3b82f6' },
+                            'to': { 'box-shadow': '0 0 10px #fff, 0 0 15px #3b82f6, 0 0 20px #3b82f6, 0 0 25px #3b82f6' }
+                        },
+                        'wiggle': {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' }
+                        },
+                        'typewriter': {
+                            'from': { width: '0' },
+                            'to': { width: '100%' }
+                        },
+                        'ping-slow': {
+                            '75%, 100%': {
+                                transform: 'scale(2)',
+                                opacity: '0'
+                            }
+                        },
+                        'spin-slow': {
+                            'from': { transform: 'rotate(0deg)' },
+                            'to': { transform: 'rotate(360deg)' }
+                        },
+                        'fade-in-up': {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(30px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        },
+                        'shimmer': {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        
+        .ai-avatar {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .xp-progress {
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        .xp-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: width 0.5s ease;
+        }
+        
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+        
+        .mobile-menu {
+            display: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: flex;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .chart-container {
+                height: 200px !important;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .stat-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .main-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .activity-feed {
+                max-height: 300px !important;
+            }
+        }
+        
+        .compact-card {
+            padding: 1rem !important;
+        }
+        
+        .dense-grid {
+            gap: 1rem !important;
+        }
+        
+        .no-white-space {
+            margin: 0;
+            padding: 0.5rem;
+        }
+        
+        .training-item {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .training-item:hover, .training-item.active {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .job-running {
+            border-left-color: #3b82f6;
+        }
+        
+        .job-completed {
+            border-left-color: #10b981;
+        }
+        
+        .job-failed {
+            border-left-color: #ef4444;
+        }
+        
+        .confidence-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .sentiment-positive {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+        
+        .sentiment-neutral {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+        
+        .sentiment-negative {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+        
+        .chat-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .chat-bubble-user {
+            background: #e0f2fe;
+            border-bottom-right-radius: 0.25rem;
+            margin-left: auto;
+        }
+        
+        .chat-bubble-ai {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .chat-bubble-flagged {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .quality-good {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .quality-bad {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        .quality-explain {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        
+        .diff-added {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 2px solid #10b981;
+            padding-left: 0.5rem;
+        }
+        
+        .diff-removed {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 2px solid #ef4444;
+            padding-left: 0.5rem;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .version-stable {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .version-testing {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        
+        .version-rolledback {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+        
+        .code-playground {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            color: #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .code-line {
+            margin-bottom: 0.25rem;
+        }
+        
+        .code-keyword {
+            color: #f472b6;
+        }
+        
+        .code-function {
+            color: #60a5fa;
+        }
+        
+        .code-string {
+            color: #34d399;
+        }
+        
+        .code-comment {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen overflow-x-hidden no-white-space">
+    <!-- Mobile Header -->
+    <div class="mobile-menu glass border-b border-gray-200 p-3 flex justify-between items-center lg:hidden">
+        <div class="flex items-center space-x-3">
+            <div class="ai-avatar w-10 h-10">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold gradient-text">CodeMentorAI</h1>
+            </div>
+        </div>
+        <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" id="mobile-menu-button">
+            <i class="fas fa-bars text-elegant-gray"></i>
+        </button>
+    </div>
+
+    <div class="flex h-screen">
+        <!-- Main Content -->
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
+            <!-- Enhanced Top Bar -->
+            <header class="glass border-b border-gray-200 p-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                        <span class="hidden sm:inline">AI Training</span>
+                        <span class="live-indicator ml-2">ACTIVE</span>
+                    </h2>
+                    <div class="relative hidden md:block">
+                        <input type="text" placeholder="Search training data..." class="bg-white border border-gray-300 rounded-lg pl-9 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-elegant-blue/50 w-64 text-sm">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-elegant-gray text-sm"></i>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <div class="flex space-x-1">
+                        <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors relative">
+                            <i class="fas fa-bell text-elegant-gray text-sm"></i>
+                            <span class="notification-dot" style="top: 4px; right: 4px;"></span>
+                        </button>
+                        <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-comment-alt text-elegant-gray text-sm"></i>
+                        </button>
+                        <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog text-elegant-gray text-sm"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 bg-white rounded-lg p-1.5 border border-gray-200 shadow-sm">
+                        <div class="ai-avatar w-6 h-6">
+                            <span class="text-xs font-bold">A</span>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:inline">Admin</span>
+                        <i class="fas fa-chevron-down text-elegant-gray text-xs"></i>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Ultra Compact Training Content -->
+            <main class="flex-1 overflow-y-auto p-3 dense-grid">
+                <!-- Training Header & Quick Actions -->
+                <div class="mb-4">
+                    <div class="glass rounded-xl p-4 card-hover compact-card">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                            <div class="flex-1">
+                                <h1 class="text-xl sm:text-2xl font-bold mb-1">AI <span class="gradient-text">Training</span> 🧠</h1>
+                                <p class="text-xs sm:text-sm text-gray-600 mb-3">Improve and optimize AI tutor performance through continuous training.</p>
+                                
+                                <div class="flex flex-wrap gap-1.5 mb-3">
+                                    <div class="flex items-center space-x-1 bg-green-50 text-green-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-check-circle text-xs"></i>
+                                        <span>v2.4.1 Active</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-database text-xs"></i>
+                                        <span>12,428 Examples</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 bg-purple-50 text-purple-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-bolt text-xs"></i>
+                                        <span>98.2% Accuracy</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 bg-amber-50 text-amber-700 px-2 py-1 rounded-full text-xs">
+                                        <i class="fas fa-chart-line text-xs"></i>
+                                        <span>+8% Satisfaction</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Actions Compact -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center" id="start-training-btn">
+                                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-play text-elegant-blue text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Start Training</span>
+                                    </button>
+                                    
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center" id="upload-data-btn">
+                                        <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-upload text-elegant-purple text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Upload Data</span>
+                                    </button>
+                                    
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center" id="quality-test-btn">
+                                        <div class="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-vial text-elegant-pink text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Quality Test</span>
+                                    </button>
+                                    
+                                    <button class="p-2 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow flex flex-col items-center justify-center" id="version-history-btn">
+                                        <div class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center mb-1">
+                                            <i class="fas fa-history text-elegant-teal text-sm"></i>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-800 text-center">Version History</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Stats Grid - Ultra Compact -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4 stat-grid">
+                    <div class="stat-card rounded-lg p-3 card-hover compact-card">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-elegant-gray text-xs">Training Examples</p>
+                                <p class="text-lg font-bold mt-0.5 text-gray-800">12,428</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                                <i class="fas fa-database text-elegant-blue text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1 flex items-center text-green-500 text-xs">
+                            <i class="fas fa-arrow-up mr-0.5"></i>
+                            <span>428 new this week</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card rounded-lg p-3 card-hover compact-card">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-elegant-gray text-xs">Model Accuracy</p>
+                                <p class="text-lg font-bold mt-0.5 text-gray-800">98.2%</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center">
+                                <i class="fas fa-brain text-elegant-purple text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1 flex items-center text-green-500 text-xs">
+                            <i class="fas fa-arrow-up mr-0.5"></i>
+                            <span>2.4% increase</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card rounded-lg p-3 card-hover compact-card">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-elegant-gray text-xs">User Satisfaction</p>
+                                <p class="text-lg font-bold mt-0.5 text-gray-800">94%</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center">
+                                <i class="fas fa-smile text-elegant-pink text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1 flex items-center text-green-500 text-xs">
+                            <i class="fas fa-arrow-up mr-0.5"></i>
+                            <span>8% increase</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card rounded-lg p-3 card-hover compact-card">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-elegant-gray text-xs">Training Jobs</p>
+                                <p class="text-lg font-bold mt-0.5 text-gray-800">42</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center">
+                                <i class="fas fa-cogs text-elegant-teal text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1 flex items-center text-green-500 text-xs">
+                            <i class="fas fa-arrow-up mr-0.5"></i>
+                            <span>3 this month</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Training Grid -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-4 main-grid">
+                    <!-- Training Management & Preview -->
+                    <div class="xl:col-span-2 space-y-4">
+                        <!-- Training Jobs -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-800">Training Jobs</h3>
+                                <div class="flex items-center space-x-2">
+                                    <button class="px-2 py-1 text-xs bg-elegant-blue text-white rounded">All</button>
+                                    <button class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">Running</button>
+                                    <button class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">Completed</button>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 max-h-80 overflow-y-auto pr-1 activity-feed">
+                                <!-- Training Job 1 - Running -->
+                                <div class="training-item job-running bg-white rounded-lg border border-gray-100 shadow-sm">
+                                    <div class="p-3">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">Running</span>
+                                                <span class="text-xs text-gray-500">Started: Today, 09:42</span>
+                                            </div>
+                                            <div class="flex space-x-1">
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-blue">
+                                                    <i class="fas fa-pause text-xs"></i>
+                                                </button>
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-purple">
+                                                    <i class="fas fa-chart-line text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <p class="text-sm font-medium text-gray-800">v2.5.0 - Algorithm Explanations</p>
+                                            <p class="text-xs text-gray-600">Improving clarity of algorithm explanations with 428 new examples</p>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center text-xs">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-user text-gray-400"></i>
+                                                    <span class="text-gray-600">Started by: Admin</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-database text-gray-400"></i>
+                                                    <span class="text-gray-600">12,856 examples</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="skill-tag">Algorithms</span>
+                                                <span class="skill-tag">Explanations</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="text-gray-600">Progress</span>
+                                                <span class="font-medium">65%</span>
+                                            </div>
+                                            <div class="confidence-bar">
+                                                <div class="confidence-fill sentiment-positive" style="width: 65%"></div>
+                                            </div>
+                                            <div class="flex justify-between text-xs text-gray-500 mt-0.5">
+                                                <span>Epoch 12/20</span>
+                                                <span>Estimated: 45 min remaining</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Training Job 2 - Completed -->
+                                <div class="training-item job-completed bg-white rounded-lg border border-gray-100 shadow-sm">
+                                    <div class="p-3">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Completed</span>
+                                                <span class="text-xs text-gray-500">Completed: Yesterday, 14:23</span>
+                                            </div>
+                                            <div class="flex space-x-1">
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-blue">
+                                                    <i class="fas fa-redo text-xs"></i>
+                                                </button>
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-purple">
+                                                    <i class="fas fa-chart-line text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <p class="text-sm font-medium text-gray-800">v2.4.1 - Code Quality Improvements</p>
+                                            <p class="text-xs text-gray-600">Enhanced code examples and explanations based on student feedback</p>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center text-xs">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-user text-gray-400"></i>
+                                                    <span class="text-gray-600">Started by: Admin</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-database text-gray-400"></i>
+                                                    <span class="text-gray-600">12,428 examples</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="skill-tag">Code Quality</span>
+                                                <span class="skill-tag">Python</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <div class="flex justify-between text-xs">
+                                                <span class="text-gray-600">Accuracy Improvement</span>
+                                                <span class="font-medium text-green-500">+2.4%</span>
+                                            </div>
+                                            <div class="flex justify-between text-xs">
+                                                <span class="text-gray-600">Satisfaction Delta</span>
+                                                <span class="font-medium text-green-500">+8%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Training Job 3 - Failed -->
+                                <div class="training-item job-failed bg-white rounded-lg border border-gray-100 shadow-sm">
+                                    <div class="p-3">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Failed</span>
+                                                <span class="text-xs text-gray-500">3 days ago</span>
+                                            </div>
+                                            <div class="flex space-x-1">
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-blue">
+                                                    <i class="fas fa-redo text-xs"></i>
+                                                </button>
+                                                <button class="p-1 text-elegant-gray hover:text-elegant-purple">
+                                                    <i class="fas fa-chart-line text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <p class="text-sm font-medium text-gray-800">v2.4.0 - Advanced Concepts</p>
+                                            <p class="text-xs text-gray-600">Training failed due to data validation errors</p>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center text-xs">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-user text-gray-400"></i>
+                                                    <span class="text-gray-600">Started by: Teacher</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-database text-gray-400"></i>
+                                                    <span class="text-gray-600">11,842 examples</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="skill-tag">Advanced</span>
+                                                <span class="skill-tag">System Design</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+                                            <p class="text-xs text-red-700">Error: Data validation failed - 42 examples with inconsistent formatting</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-3 border-t border-gray-200">
+                                <button class="w-full py-2 bg-gradient-to-r from-elegant-blue to-elegant-purple rounded-lg text-sm font-medium flex items-center justify-center space-x-2 text-white">
+                                    <i class="fas fa-plus text-xs"></i>
+                                    <span>Start New Training Job</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Preview Diff -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-800">Preview Changes</h3>
+                                <div class="flex items-center space-x-2">
+                                    <button class="px-2 py-1 text-xs bg-elegant-blue text-white rounded">Apply</button>
+                                    <button class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">Test More</button>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <!-- Test Prompt -->
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <label class="text-xs font-medium text-gray-700 mb-2 block">Test Prompt</label>
+                                    <div class="chat-bubble chat-bubble-user">
+                                        <p class="text-sm">Can you explain how binary search works and show me an implementation in Python?</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Before/After Comparison -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Before Training -->
+                                    <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <span class="text-xs font-medium text-red-600">Before (v2.4.1)</span>
+                                            <span class="px-1.5 py-0.5 bg-red-100 text-red-700 text-xs rounded">85% Confidence</span>
+                                        </div>
+                                        <div class="chat-bubble chat-bubble-ai">
+                                            <p class="text-sm mb-2">Binary search is an efficient algorithm for finding an item in a sorted list. Here's an implementation:</p>
+                                            <div class="code-playground text-xs">
+                                                <div class="code-line"><span class="code-comment"># Binary search implementation</span></div>
+                                                <div class="code-line"><span class="code-keyword">def</span> <span class="code-function">binary_search</span>(arr, target):</div>
+                                                <div class="code-line">&nbsp;&nbsp;<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-function">range</span>(<span class="code-function">len</span>(arr)):</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> arr[i] == target:</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> i</div>
+                                                <div class="code-line">&nbsp;&nbsp;<span class="code-keyword">return</span> -1</div>
+                                            </div>
+                                            <p class="text-xs text-amber-600 mt-2">⚠️ This is actually linear search, not binary search</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- After Training -->
+                                    <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <span class="text-xs font-medium text-green-600">After (v2.5.0)</span>
+                                            <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded">94% Confidence</span>
+                                        </div>
+                                        <div class="chat-bubble chat-bubble-ai">
+                                            <p class="text-sm mb-2">Binary search is an efficient O(log n) algorithm that works by repeatedly dividing the search interval in half. Here's the correct implementation:</p>
+                                            <div class="code-playground text-xs">
+                                                <div class="code-line"><span class="code-comment"># Binary search implementation</span></div>
+                                                <div class="code-line"><span class="code-keyword">def</span> <span class="code-function">binary_search</span>(arr, target):</div>
+                                                <div class="code-line">&nbsp;&nbsp;left, right = 0, <span class="code-function">len</span>(arr) - 1</div>
+                                                <div class="code-line">&nbsp;&nbsp;<span class="code-keyword">while</span> left <= right:</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;mid = (left + right) // 2</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> arr[mid] == target:</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> mid</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">elif</span> arr[mid] < target:</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left = mid + 1</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">else</span>:</div>
+                                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;right = mid - 1</div>
+                                                <div class="code-line">&nbsp;&nbsp;<span class="code-keyword">return</span> -1</div>
+                                            </div>
+                                            <p class="text-xs text-gray-600 mt-2">This correctly implements the divide-and-conquer approach with O(log n) time complexity.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Change Summary -->
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <label class="text-xs font-medium text-gray-700 mb-2 block">Change Summary</label>
+                                    <div class="space-y-2 text-sm">
+                                        <div class="diff-removed">- Incorrect linear search implementation presented as binary search</div>
+                                        <div class="diff-added">+ Correct binary search with proper divide-and-conquer approach</div>
+                                        <div class="diff-added">+ Clear explanation of O(log n) time complexity</div>
+                                        <div class="diff-added">+ Proper variable naming and algorithm structure</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Sidebar - Training Tools -->
+                    <div class="space-y-4">
+                        <!-- Dataset Manager -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-800">Dataset Manager</h3>
+                                <button class="px-2 py-1 text-xs bg-elegant-teal/10 text-elegant-teal rounded">Upload</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-gray-700">Total Examples</span>
+                                        <span class="text-xs font-bold text-gray-800">12,428</span>
+                                    </div>
+                                    <div class="xp-progress">
+                                        <div class="xp-progress-fill" style="width: 100%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-0.5">Labeled Q/A pairs</p>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-gray-700">Quality Score</span>
+                                        <span class="text-xs font-bold text-gray-800">96%</span>
+                                    </div>
+                                    <div class="xp-progress">
+                                        <div class="xp-progress-fill" style="width: 96%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-0.5">Human-verified examples</p>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-gray-700">New This Week</span>
+                                        <span class="text-xs font-bold text-gray-800">428</span>
+                                    </div>
+                                    <div class="xp-progress">
+                                        <div class="xp-progress-fill" style="width: 65%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-0.5">From Sentinel corrections</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-3 border-t border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-medium text-gray-700">Last Updated</span>
+                                    <span class="text-xs text-gray-500">Today, 09:42</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-0.5">428 examples added in current job</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Quality Test Suite -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold text-gray-800">Quality Test Suite</h3>
+                                <button class="px-2 py-1 text-xs bg-elegant-purple/10 text-elegant-purple rounded">Run Tests</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                            <i class="fas fa-check text-green-500 text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Algorithm Accuracy</p>
+                                            <p class="text-xs text-gray-500">98.2% pass rate</p>
+                                        </div>
+                                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    </div>
+                                    <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                        <span>42/42 tests passed</span>
+                                        <span>+2.4%</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                            <i class="fas fa-check text-green-500 text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Explanation Quality</p>
+                                            <p class="text-xs text-gray-500">96.7% pass rate</p>
+                                        </div>
+                                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    </div>
+                                    <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                        <span>38/39 tests passed</span>
+                                        <span>+5.2%</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                                            <i class="fas fa-exclamation-triangle text-amber-500 text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Tone & Sentiment</p>
+                                            <p class="text-xs text-gray-500">91.3% pass rate</p>
+                                        </div>
+                                        <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+                                    </div>
+                                    <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                        <span>21/23 tests passed</span>
+                                        <span>-1.2%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button class="w-full py-1.5 bg-gradient-to-r from-elegant-purple to-elegant-pink rounded-lg text-xs font-medium flex items-center justify-center space-x-1 text-white">
+                                    <i class="fas fa-vial text-xs"></i>
+                                    <span>Run Full Test Suite</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Version History -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold text-gray-800">Version History</h3>
+                                <button class="px-2 py-1 text-xs bg-elegant-pink/10 text-elegant-pink rounded">View All</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                            <span class="text-xs font-bold text-green-700">v2.4.1</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Current Stable</p>
+                                            <p class="text-xs text-gray-500">Code quality improvements</p>
+                                        </div>
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full version-stable">Active</span>
+                                    </div>
+                                    <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                        <span>Deployed: 5 days ago</span>
+                                        <span>+8% satisfaction</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <span class="text-xs font-bold text-blue-700">v2.5.0</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">In Testing</p>
+                                            <p class="text-xs text-gray-500">Algorithm explanations</p>
+                                        </div>
+                                        <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full version-testing">Testing</span>
+                                    </div>
+                                    <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                        <span>Training: 65%</span>
+                                        <span>15% A/B test</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                                            <span class="text-xs font-bold text-gray-700">v2.3.2</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Previous</p>
+                                            <p class="text-xs text-gray-500">Basic functionality</p>
+                                        </div>
+                                        <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full version-rolledback">Archived</span>
+                                    </div>
+                                    <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                        <span>Rolled back: 12 days ago</span>
+                                        <span>-3% accuracy</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button class="w-full py-1.5 bg-gradient-to-r from-elegant-amber to-elegant-rose rounded-lg text-xs font-medium flex items-center justify-center space-x-1 text-white">
+                                    <i class="fas fa-history text-xs"></i>
+                                    <span>View Full History</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Improvement Queue -->
+                        <div class="glass rounded-xl p-4 card-hover compact-card">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold text-gray-800">Improvement Queue</h3>
+                                <button class="px-2 py-1 text-xs bg-elegant-cyan/10 text-elegant-cyan rounded">Add</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-gray-700">Better Recursion Examples</span>
+                                        <span class="text-xs font-bold text-gray-800">High</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Suggested by Teacher: Maria Rodriguez</p>
+                                    <div class="mt-1 flex items-center space-x-1">
+                                        <span class="skill-tag">Recursion</span>
+                                        <span class="skill-tag">Examples</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-medium text-gray-700">System Design Prompts</span>
+                                        <span class="text-xs font-bold text-gray-800">Medium</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500">From Sentinel: 12 flagged items</p>
+                                    <div class="mt-1 flex items-center space-x-1">
+                                        <span class="skill-tag">System Design</span>
+                                        <span class="skill-tag">Architecture</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 pt-3 border-t border-gray-200">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-600">Queue Length</span>
+                                    <span class="text-gray-500">8 items</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Validation Metrics -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                    <!-- Performance Metrics -->
+                    <div class="glass rounded-xl p-4 card-hover compact-card lg:col-span-2">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-bold text-gray-800">Validation Metrics</h3>
+                            <div class="flex space-x-1">
+                                <button class="px-2 py-0.5 text-xs bg-elegant-blue text-white rounded">7D</button>
+                                <button class="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded">30D</button>
+                            </div>
+                        </div>
+                        <div class="h-40 chart-container">
+                            <canvas id="metricsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- A/B Testing Status -->
+                    <div class="glass rounded-xl p-4 card-hover compact-card">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-bold text-gray-800">A/B Testing</h3>
+                            <button class="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded">Manage</button>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <i class="fas fa-vial text-blue-500 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-800">v2.5.0 Testing</p>
+                                    <p class="text-xs text-gray-600">15% of users</p>
+                                    <div class="flex items-center space-x-1.5 mt-1">
+                                        <span class="text-xs text-gray-500">+12% satisfaction</span>
+                                        <div class="xp-progress flex-1">
+                                            <div class="xp-progress-fill" style="width: 15%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3 p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-check text-green-500 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-800">v2.4.1 Stable</p>
+                                    <p class="text-xs text-gray-600">85% of users</p>
+                                    <div class="flex items-center space-x-1.5 mt-1">
+                                        <span class="text-xs text-gray-500">94% satisfaction</span>
+                                        <div class="xp-progress flex-1">
+                                            <div class="xp-progress-fill" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Training Controls -->
+                <div class="glass rounded-xl p-4 card-hover compact-card mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Training Controls</h3>
+                        <button class="px-3 py-1.5 bg-elegant-blue text-white rounded-lg text-xs font-medium">Save Settings</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-800">Auto-Retrain</span>
+                                <label class="feature-flag">
+                                    <input type="checkbox" checked>
+                                    <span class="feature-flag-slider"></span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500">Weekly retraining with new data</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-800">Sentinel Integration</span>
+                                <label class="feature-flag">
+                                    <input type="checkbox" checked>
+                                    <span class="feature-flag-slider"></span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500">Use approved corrections in training</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-800">A/B Testing</span>
+                                <label class="feature-flag">
+                                    <input type="checkbox" checked>
+                                    <span class="feature-flag-slider"></span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500">Test new versions with small user groups</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Floating AI Assistant -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <button class="w-12 h-12 rounded-full bg-gradient-to-r from-elegant-blue to-elegant-purple flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow text-white floating-element">
+            <i class="fas fa-robot"></i>
+        </button>
+    </div>
+
+    <script>
+        // Initialize charts when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Validation Metrics Chart
+            const metricsCtx = document.getElementById('metricsChart').getContext('2d');
+            const metricsChart = new Chart(metricsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['v2.3.2', 'v2.4.0', 'v2.4.1', 'v2.5.0 (test)'],
+                    datasets: [
+                        {
+                            label: 'Accuracy',
+                            data: [95.8, 93.4, 98.2, 98.6],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'User Satisfaction',
+                            data: [86, 82, 94, 96],
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Response Quality',
+                            data: [88, 85, 96, 97],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 80,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                font: {
+                                    size: 9
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 9
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-button').addEventListener('click', function() {
+                // This would toggle the sidebar if it was included
+                // For now, we'll just show an alert since the sidebar isn't in this code
+                alert('Sidebar toggle would appear here. In the full implementation, this would show/hide the navigation sidebar.');
+            });
+            
+            // Add interactivity to training items
+            document.querySelectorAll('.training-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on action buttons
+                    if (!e.target.closest('button')) {
+                        document.querySelectorAll('.training-item').forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // In a real implementation, this would load the selected training job details
+                        alert('Selected training job details would load here with logs, metrics, and configuration.');
+                    }
+                });
+            });
+            
+            // Quick action buttons
+            document.getElementById('start-training-btn').addEventListener('click', function() {
+                alert('Training configuration modal would open with options for dataset selection, parameters, and scheduling.');
+            });
+            
+            document.getElementById('upload-data-btn').addEventListener('click', function() {
+                alert('Data upload interface would open with support for CSV/JSON formats and data validation.');
+            });
+            
+            document.getElementById('quality-test-btn').addEventListener('click', function() {
+                alert('Quality test suite would run validation tests and show detailed results.');
+            });
+            
+            document.getElementById('version-history-btn').addEventListener('click', function() {
+                alert('Full version history would open with detailed change logs and performance metrics.');
+            });
+            
+            // Simulate live updates for training progress
+            setInterval(() => {
+                // Update running job progress
+                const runningJob = document.querySelector('.job-running .confidence-fill');
+                if (runningJob) {
+                    const currentWidth = parseInt(runningJob.style.width);
+                    if (currentWidth < 100) {
+                        runningJob.style.width = (currentWidth + 1) + '%';
+                        
+                        // Update progress text
+                        const progressText = runningJob.closest('.training-item').querySelector('.font-medium');
+                        if (progressText) {
+                            progressText.textContent = (currentWidth + 1) + '%';
+                        }
+                        
+                        // Update epoch count
+                        const epochText = runningJob.closest('.training-item').querySelector('.text-gray-500');
+                        if (epochText && currentWidth % 5 === 0) {
+                            const currentEpoch = parseInt(epochText.textContent.split(' ')[1].split('/')[0]);
+                            epochText.textContent = `Epoch ${currentEpoch + 1}/20`;
+                        }
+                    }
+                }
+            }, 2000);
+            
+            // Feature flag toggles
+            document.querySelectorAll('.feature-flag input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const parent = this.closest('.bg-white');
+                    if (this.checked) {
+                        parent.classList.add('border-green-200', 'bg-green-50');
+                    } else {
+                        parent.classList.remove('border-green-200', 'bg-green-50');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
