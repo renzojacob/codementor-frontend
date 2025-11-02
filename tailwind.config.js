@@ -11,14 +11,26 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-        }
+          light: '#3B82F6',
+          DEFAULT: '#2563EB',
+          dark: '#1D4ED8',
+        },
+        secondary: {
+          orange: '#F97316',
+          green: '#10B981',
+          red: '#EF4444',
+        },
+        gray: {
+          100: '#F9FAFB',
+          200: '#E5E7EB',
+          500: '#6B7280',
+          700: '#374151',
+          900: '#111827',
+        },
       },
-      fontFamily: {
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(to right, #3B82F6, #8B5CF6)',
+      }, fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
       }
     },

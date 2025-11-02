@@ -1,4 +1,4 @@
-
+<!-- AuthLayout.vue -->
 <template>
   <div>
     <AuthHeader />
@@ -13,4 +13,3 @@
 import AuthHeader from '../../components/layout/AuthHeader.vue';
 import Footer from '../../components/layout/Footer.vue';
 </script>
-

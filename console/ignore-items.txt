@@ -9,6 +9,8 @@ README.md
 
 
 structure
-ignore-folders.txt
+console
 .js
 .tree
+
+htmls
