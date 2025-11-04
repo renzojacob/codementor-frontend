@@ -1,0 +1,35 @@
+:root {
+  /* Primary Colors (pri) */
+  --pri-50: #f0f9ff;
+  --pri-100: #e0f2fe;
+  --pri-200: #bae6fd;
+  --pri-300: #7dd3fc;
+  --pri-400: #38bdf8;
+  --pri-500: #0ea5e9;
+  --pri-600: #0284c7;
+  --pri-700: #0369a1;
+  --pri-800: #075985;
+  --pri-900: #0c4a6e;
+  
+  /* Gray Colors (gry) */
+  --gry-50: #f9fafb;
+  --gry-100: #f3f4f6;
+  --gry-200: #e5e7eb;
+  --gry-300: #d1d5db;
+  --gry-400: #9ca3af;
+  --gry-500: #6b7280;
+  --gry-600: #4b5563;
+  --gry-700: #374151;
+  --gry-800: #1f2937;
+  --gry-900: #111827;
+
+  /* Accent Colors */
+  --acc-grn-500: #10b981;
+  --acc-grn-600: #059669;
+  --acc-org-500: #f59e0b;
+  --acc-org-600: #d97706;
+  --acc-ind-500: #6366f1;
+  --acc-ind-600: #4f46e5;
+  --acc-red-500: #ef4444;
+  --acc-red-600: #dc2626;
+}

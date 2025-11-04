@@ -1,33 +1,46 @@
+// src/main/router.js
 import { createRouter, createWebHistory } from 'vue-router'
 
-import Home from './pages/Home.vue'
-import Challenge from './pages/Challenge.vue'
-import Leaderboard from './pages/Leaderboard.vue'
-import Login from './pages/Login.vue'
-import Register from './pages/Register.vue'
-import VerifyEmail from './pages/VerifyEmail.vue'
+// --- Lazy-loaded page imports (improves performance) ---
+const Home = () => import('./pages/Home.vue')
+const Challenge = () => import('./pages/Challenge.vue')
+const Leaderboard = () => import('./pages/Leaderboard.vue')
+const Login = () => import('./pages/Login.vue')
+const Register = () => import('./pages/Register.vue')
+const VerifyEmail = () => import('./pages/VerifyEmail.vue')
 
-import LearnHome from './pages/learn/LearnHome.vue'
-import LearnLayout from './pages/learn/LearnLayout.vue'
-import TryItEditor from './pages/learn/TryItEditor.vue'
+// Learn section
+const LearnHome = () => import('./pages/learn/LearnHome.vue')
+const LearnLayout = () => import('./pages/learn/LearnLayout.vue')
+const TryItEditor = () => import('./pages/learn/TryItEditor.vue')
+const LearnDynamic = () => import('./pages/learn/LearnDynamic.vue')
 
 // --- Route definitions ---
 const routes = [
-  // Public main routes
+  // Public routes
   { path: '/', component: Home, meta: { layout: 'PublicLayout' } },
   { path: '/login', component: Login, meta: { layout: 'PublicLayout', guestOnly: true } },
   { path: '/register', component: Register, meta: { layout: 'PublicLayout', guestOnly: true } },
   { path: '/verify-email', component: VerifyEmail, meta: { layout: 'PublicLayout' } },
 
-  // Authenticated pages
-  { path: '/leaderboard', component: Leaderboard, meta: { layout: 'AuthLayout', requiresAuth: true } },
-  { path: '/challenge/:id', component: Challenge, meta: { layout: 'ChallengeLayout', requiresAuth: true } },
+  // Authenticated routes
+  {
+    path: '/leaderboard',
+    component: Leaderboard,
+    meta: { layout: 'AuthLayout', requiresAuth: true },
+  },
+  {
+    path: '/challenge/:id',
+    component: Challenge,
+    meta: { layout: 'ChallengeLayout', requiresAuth: true },
+  },
 
-  // Learn Section (public)
+  // --- Learn Section (public) ---
   {
     path: '/learn',
+    name: 'LearnHome',
     component: LearnHome,
-    meta: { layout: 'PublicLayout' }
+    meta: { layout: 'PublicLayout' },
   },
   {
     path: '/learn/:lang',
@@ -36,47 +49,50 @@ const routes = [
     children: [
       {
         path: '',
-        redirect: to => `/learn/${to.params.lang}/intro`
+        redirect: (to) => `/learn/${to.params.lang}/intro`, // Default redirect to intro topic
       },
       {
         path: 'try',
+        name: 'TryItEditor',
         component: TryItEditor,
-        meta: { layout: 'PublicLayout' }
+        meta: { layout: 'PublicLayout' },
       },
       {
         path: ':topic',
-        component: () => import('./pages/learn/LearnDynamic.vue'),
-        meta: { layout: 'PublicLayout' }
-      }
-    ]
+        name: 'LearnDynamic',
+        component: LearnDynamic,
+        meta: { layout: 'PublicLayout' },
+      },
+    ],
   },
 
   // 404 fallback
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/'
-  }
+    redirect: '/',
+  },
 ]
 
 // --- Router setup ---
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })
 
 // --- Global route guard ---
 router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('access_token')
   const layout = to.meta.layout || 'PublicLayout'
   to.meta.layoutName = layout
 
-  const isAuthenticated = !!localStorage.getItem('access_token') // your auth logic
-
+  // Auth guard
   if (to.meta.requiresAuth && !isAuthenticated) {
-    return next('/login') // redirect unauthenticated users
+    return next({ path: '/login', query: { redirect: to.fullPath } })
   }
 
+  // Guest-only guard
   if (to.meta.guestOnly && isAuthenticated) {
-    return next('/') // redirect logged-in users from guest pages
+    return next('/')
   }
 
   next()

@@ -5,13 +5,13 @@
         <!-- Brand -->
         <div>
           <router-link to="/" class="flex items-center space-x-2 mb-3">
-            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <i class="fas fa-robot text-white"></i>
-            </div>
-            <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              CodeMentor
-            </span>
-          </router-link>
+          <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <i class="fas fa-robot text-white"></i>
+          </div>
+          <span class="text-xl font-bold bg-gray-900 bg-clip-text text-transparent">
+            CodeMentor
+          </span>
+        </router-link>
           <p class="text-gray-500 text-sm">
             Learn coding, solve challenges, and grow your developer journey.
           </p>

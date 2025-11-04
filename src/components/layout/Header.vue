@@ -4,10 +4,12 @@
       <div class="flex justify-between items-center h-16">
         <!-- Logo -->
         <router-link to="/" class="flex items-center space-x-2">
-          <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+          <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
             <i class="fas fa-robot text-white"></i>
           </div>
-          <span class="text-xl font-bold text-blue-600">CodeMentor</span>
+          <span class="text-xl font-bold bg-gray-900 bg-clip-text text-transparent">
+            CodeMentor
+          </span>
         </router-link>
 
         <!-- Navigation (Desktop) -->
@@ -31,7 +33,7 @@
               Sign In
             </router-link>
             <router-link to="/register"
-              class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 shadow-sm font-medium transition-all duration-200">
+              class="bg-blue-500 text-white px-5 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 shadow-sm font-medium transition-all duration-200">
               Get Started
             </router-link>
           </template>

@@ -1,17 +1,32 @@
+<!-- src/main/pages/learn/LearnHome.vue -->
 <template>
-  <div class="p-8 grid grid-cols-2 md:grid-cols-3 gap-6">
-    <RouterLink
-      v-for="(lang, key) in tutorials"
-      :key="key"
-      :to="`/learn/${key}`"
-      class="p-6 border rounded hover:bg-green-50"
-    >
-      <h2 class="text-xl font-bold mb-2">{{ lang.title }}</h2>
-      <p class="text-sm text-gray-500">Start learning {{ key.toUpperCase() }}</p>
-    </RouterLink>
+  <div class="p-8">
+    <h1 class="text-2xl font-bold mb-6">Choose a Language</h1>
+
+    <div v-if="loading" class="text-gray-500">Loading...</div>
+    <div v-else class="grid grid-cols-2 md:grid-cols-3 gap-6">
+      <RouterLink
+        v-for="lang in languages"
+        :key="lang.slug"
+        :to="`/learn/${lang.slug}`"
+        class="p-6 border rounded hover:bg-green-50"
+      >
+        <h2 class="text-xl font-bold mb-2">{{ lang.name }}</h2>
+        <p class="text-sm text-gray-500">
+          {{ lang.description || `Start learning ${lang.name}` }}
+        </p>
+      </RouterLink>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { tutorials } from './data/tutorials'
+import { onMounted } from 'vue'
+import { useTutorials } from '@/consumables/useTutorials'
+
+const { languages, fetchLanguages, loading } = useTutorials()
+
+onMounted(() => {
+  fetchLanguages()
+})
 </script>
