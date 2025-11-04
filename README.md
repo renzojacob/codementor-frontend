@@ -1,192 +1,167 @@
-# VITE + VUE 3 + TAILWIND CSS 4 SETUP GUIDE
+# ⚡ Codementor Frontend — Vue 3 + Vite + Tailwind CSS
 
-This guide explains how to install all required dependencies and run your development server for this project.
+A modular **Vue 3 + Vite** project structured for three separate entry points:
+
+* **Main site** → `/src/main/`
+* **Admin dashboard** → `/src/admin/`
+* **API / Interactive coding** → `/src/api/`
+
+Each entry has its own router and layout but shares global components, stores, and styles.
 
 ---
 
-## PREREQUISITES
+## 🧩 Prerequisites
 
-Before you begin, make sure you have:
+Before you begin, ensure you have:
 
-* Node.js version 18 or higher
-  (Download from: [https://nodejs.org/](https://nodejs.org/))
-* npm (comes with Node)
+* **Node.js 18+** — [Download here](https://nodejs.org/)
+* **npm** (comes with Node)
 
 Check your versions:
+
+```bash
 node -v
 npm -v
-
----
-
-1. INSTALL DEPENDENCIES
-
----
-
-In your project directory (C:\ViteVue\codementor-frontend), run:
-
 ```
+
+---
+
+## 📦 Installation
+
+In your project directory, run:
+
+```bash
 npm install
 ```
 
-This installs all dependencies listed in your package.json.
+This installs all required dependencies from `package.json`.
 
-Dependencies:
+### Dependencies
 
-* `vue` – Vue 3 framework
-* `vue-router` – Router for Vue 3
-* `pinia` – State management library
-* `pinia-plugin-persistedstate` – Persistent state plugin
-* `dayjs` – Lightweight date library
-* `clsx` – Conditional class helper
-* `chart.js` – Charting library
-* `@fortawesome/fontawesome-free` – Font Awesome icons
+* `vue` — Core Vue 3 framework
+* `vue-router` — Page routing
+* `pinia` — State management
+* `pinia-plugin-persistedstate` — Store persistence
+* `dayjs` — Date and time formatting
+* `clsx` — Conditional class helper
+* `chart.js` — Charting library for analytics
+* `@fortawesome/fontawesome-free` — Font Awesome icons
 
-Dev Dependencies:
+### Dev Dependencies
 
-* `vite` – Frontend build tool
-* `@vitejs/plugin-vue` – Vue support for Vite
-* `tailwindcss` – Utility-first CSS framework
-* `@tailwindcss/postcss` – Tailwind's PostCSS plugin (v4+)
-* `postcss` – CSS processor
-* `autoprefixer` – Adds vendor prefixes
+* `vite` — Build tool and dev server
+* `@vitejs/plugin-vue` — Vue support for Vite
+* `tailwindcss`, `postcss`, `autoprefixer` — Styling tools
 
 ---
 
-2. CONFIGURE TAILWIND CSS
+## 🧰 Available Scripts
+
+| Command           | Description                          |
+| ----------------- | ------------------------------------ |
+| `npm run dev`     | Start the local development server   |
+| `npm run build`   | Build the project for production     |
+| `npm run preview` | Preview the production build locally |
 
 ---
 
-Create a file named "tailwind.config.js" in your project root with this content:
+## 🚀 Running the Project
 
-```
-export default {
-  content: [
-    './index.html',
-    './admin.html',
-    './api.html',
-    './src/**/*.{vue,js,ts}',
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
-```
+To start the development server:
 
-Then create "postcss.config.js" with this content:
-
-```
-import tailwind from '@tailwindcss/postcss';
-import autoprefixer from 'autoprefixer';
-
-export default {
-  plugins: [tailwind, autoprefixer],
-};
-```
-
-Finally, in your main CSS file (e.g., src/style.css), add:
-
-```
-@import "tailwindcss";
-```
-
----
-
-3. SCRIPTS
-
----
-
-Your package.json includes these scripts:
-
-* npm run dev     → Start the local development server
-* npm run build   → Build for production
-* npm run preview → Preview the production build
-
----
-
-4. RUNNING THE PROJECT
-
----
-
-Start the development server with:
-
-```
+```bash
 npm run dev
 ```
 
-Expected output:
+Example output:
 
 ```
-VITE v7.1.x ready in 500ms
-  ➜ Local: http://localhost:5173/
+VITE v7.1.x  ready in 500ms
+➜  Local: http://localhost:5173/
 ```
 
-Open your browser and go to [http://localhost:5173](http://localhost:5173)
+Then open [http://localhost:5173](http://localhost:5173) in your browser.
+Each HTML entry (index.html, admin.html, api.html) serves a different Vue app.
 
 ---
 
-5. BUILD FOR PRODUCTION
+## 🏗️ Building for Production
 
----
+To create an optimized production build:
 
-Create an optimized build:
-
-```
+```bash
 npm run build
 ```
 
-Preview the production build:
+To preview the build:
 
-```
+```bash
 npm run preview
 ```
 
 ---
 
-6. TROUBLESHOOTING
+## 🧩 Project Structure
 
----
-
-If you encounter Tailwind or PostCSS errors, try:
-
-```
-npm uninstall tailwindcss postcss autoprefixer @tailwindcss/postcss
-npm install -D tailwindcss @tailwindcss/postcss postcss autoprefixer
-```
-
-Make sure that:
-
-* postcss.config.js uses ESM syntax (export default)
-* package.json includes "type": "module"
-* You are using Tailwind CSS version 4 or higher
-
----
-
-## EXAMPLE PROJECT STRUCTURE
 ```
 codementor-frontend/
-├─ index.html
-├─ admin.html
-├─ api.html
-├─ public/                 # Static assets served as-is
-├─ src/
-│   ├─ assets/             # Images, fonts, icons, etc.
-│   ├─ components/         # Reusable Vue components
-│   ├─ composables/        # Vue composables (hooks)
-│   ├─ store/              # Pinia stores (shared)
-│   ├─ styles/             # Tailwind + global CSS
-│   ├─ main/               # Public site entry
-│   ├─ admin/              # Admin dashboard entry
-│   ├─ api/                # API / interactive coding entry
-├─ tailwind.config.js
-├─ postcss.config.js
-├─ vite.config.js
+├─ index.html              # Public entry
+├─ admin.html              # Admin dashboard entry
+├─ api.html                # API / coding interface entry
 ├─ package.json
-└─ package-lock.json
+├─ vite.config.js          # Multi-entry Vite config
+├─ tailwind.config.js      # Tailwind setup
+├─ postcss.config.js       # CSS processor config
+├─ public/                 # Static assets served as-is
+│   └─ vite.svg
+└─ src/
+   ├─ assets/              # Images, fonts, icons
+   ├─ components/          # Reusable UI components
+   │   ├─ layout/          # Header, Footer, Sidebar
+   │   └─ ui/              # Buttons, Pagination, etc.
+   ├─ consumables/         # Reusable logic (useAuth, useApi, etc.)
+   ├─ store/               # Shared Pinia stores
+   ├─ styles/              # Tailwind & global CSS
+   ├─ main/                # Public-facing app (Home, Learn, Challenge)
+   ├─ admin/               # Admin dashboard (Users, Analytics)
+   └─ api/                 # Interactive coding environment
 ```
+
 ---
 
-## DONE!
+## 🧠 Notes
 
-You now have a working Vue 3 + Vite + Tailwind CSS 4 setup.
-Run "npm run dev" and start building awesome UIs!
+* Each entry (`main`, `admin`, `api`) has its own `main.js`, `router.js`, and layout folder.
+* Routes use meta fields like `layout`, `requiresAuth`, and `guestOnly` to control navigation and design.
+* Global state (user, submissions, settings) is shared through **Pinia**.
+* Styles and components are consistent across all sections.
+
+---
+
+## 🛠️ Troubleshooting
+
+If you encounter Tailwind or PostCSS errors, try reinstalling:
+
+```bash
+npm uninstall tailwindcss postcss autoprefixer
+npm install -D tailwindcss postcss autoprefixer
+```
+
+Make sure:
+
+* `postcss.config.js` uses CommonJS (`module.exports = {}`)
+* `"type": "module"` is in your `package.json`
+* Tailwind CSS version is up-to-date
+
+---
+
+## ✅ Done!
+
+You now have a fully functional **Vue 3 + Vite + Tailwind CSS** project with modular structure.
+Run:
+
+```bash
+npm run dev
+```
+
+and start building your frontend apps!

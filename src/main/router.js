@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// --- Existing Pages ---
 import Home from './pages/Home.vue'
 import Challenge from './pages/Challenge.vue'
 import Leaderboard from './pages/Leaderboard.vue'
@@ -8,7 +7,6 @@ import Login from './pages/Login.vue'
 import Register from './pages/Register.vue'
 import VerifyEmail from './pages/VerifyEmail.vue'
 
-// --- Learn Section ---
 import LearnHome from './pages/learn/LearnHome.vue'
 import LearnLayout from './pages/learn/LearnLayout.vue'
 import TryItEditor from './pages/learn/TryItEditor.vue'
