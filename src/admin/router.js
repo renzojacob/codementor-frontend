@@ -11,6 +11,17 @@ const routes = [
   { path: '/admin/users', component: Users, meta: { layout: 'AdminLayout', requiresAuth: true, requiresAdmin: true } },
   { path: '/admin/content', component: Content, meta: { layout: 'AdminLayout', requiresAuth: true, requiresAdmin: true } },
   { path: '/admin/analytics', component: Analytics, meta: { layout: 'AdminLayout', requiresAuth: true, requiresAdmin: true } },
+  {
+  path: '/lessons',
+  name: 'Lessons',
+  component: () => import('./pages/Lessons.vue'),
+},
+{
+  path: '/lessons/preview/:slug',
+  name: 'LessonPreview',
+  component: () => import('@/admin/layouts/PreviewLayout.vue'),
+},
+
 ];
 
 const router = createRouter({

@@ -15,27 +15,40 @@ const LearnLayout = () => import('./pages/learn/LearnLayout.vue')
 const TryItEditor = () => import('./pages/learn/TryItEditor.vue')
 const LearnDynamic = () => import('./pages/learn/LearnDynamic.vue')
 
+// Layout components
+const BlankLayout = () => import('./layouts/BlankLayout.vue')
+const AuthLayout = () => import('./layouts/AuthLayout.vue')
+const PublicLayout = () => import('./layouts/PublicLayout.vue')
+const ChallengeLayout = () => import('./layouts/ChallengeLayout.vue')
+const AppLayout = () => import('./layouts/AppLayout.vue')
+
 // --- Route definitions ---
 const routes = [
-  // Public routes
-  { path: '/', component: Home, meta: { layout: 'PublicLayout' } },
-  { path: '/login', component: Login, meta: { layout: 'PublicLayout', guestOnly: true } },
-  { path: '/register', component: Register, meta: { layout: 'PublicLayout', guestOnly: true } },
-  { path: '/verify-email', component: VerifyEmail, meta: { layout: 'PublicLayout' } },
-
-  // Authenticated routes
+  // Public routes (Marketing site)
   {
-    path: '/leaderboard',
-    component: Leaderboard,
-    meta: { layout: 'AuthLayout', requiresAuth: true },
-  },
-  {
-    path: '/challenge/:id',
-    component: Challenge,
-    meta: { layout: 'ChallengeLayout', requiresAuth: true },
+    path: '/',
+    component: Home,
+    meta: { layout: 'PublicLayout' }
   },
 
-  // --- Learn Section (public) ---
+  // Auth routes (Authentication flow)
+  {
+    path: '/login',
+    component: Login,
+    meta: { layout: 'AuthLayout', guestOnly: true }
+  },
+  {
+    path: '/register',
+    component: Register,
+    meta: { layout: 'AuthLayout', guestOnly: true }
+  },
+  {
+    path: '/verify-email',
+    component: VerifyEmail,
+    meta: { layout: 'AuthLayout' }
+  },
+
+  // Learn Section (Public educational content)
   {
     path: '/learn',
     name: 'LearnHome',
@@ -66,6 +79,20 @@ const routes = [
     ],
   },
 
+  // Authenticated routes (App functionality)
+
+  // Update these routes:
+  {
+    path: '/leaderboard',
+    component: Leaderboard,
+    meta: { layout: 'AppLayout', requiresAuth: true },
+  },
+  {
+    path: '/challenge/:id',
+    component: Challenge,
+    meta: { layout: 'AppLayout', requiresAuth: true },
+  },
+
   // 404 fallback
   {
     path: '/:pathMatch(.*)*',
@@ -79,18 +106,33 @@ const router = createRouter({
   routes,
 })
 
+// --- Layout component mapping ---
+const layoutComponents = {
+  BlankLayout,
+  AuthLayout,
+  PublicLayout,
+  ChallengeLayout,
+  AppLayout,
+}
+
 // --- Global route guard ---
 router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('access_token')
+
+  // Set default layout if not specified
   const layout = to.meta.layout || 'PublicLayout'
-  to.meta.layoutName = layout
+  to.meta.layoutComponent = layoutComponents[layout]
 
   // Auth guard
   if (to.meta.requiresAuth && !isAuthenticated) {
-    return next({ path: '/login', query: { redirect: to.fullPath } })
+    return next({
+      path: '/login',
+      query: { redirect: to.fullPath },
+      meta: { layout: 'AuthLayout' }
+    })
   }
 
-  // Guest-only guard
+  // Guest-only guard (redirect authenticated users away from auth pages)
   if (to.meta.guestOnly && isAuthenticated) {
     return next('/')
   }

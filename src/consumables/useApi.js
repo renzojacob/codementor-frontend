@@ -96,6 +96,23 @@ export function logout() {
   clearTokens();
 }
 
+// Admin Stats functions
+export async function getAdminStats() {
+  return request('/admin/stats', { method: 'GET' });
+}
+
+export async function getUserGrowth(months = 6) {
+  return request(`/admin/user-growth?months=${months}`, { method: 'GET' });
+}
+
+export async function getLessonEngagement(limit = 10) {
+  return request(`/admin/lesson-engagement?limit=${limit}`, { method: 'GET' });
+}
+
+export async function getRecentActivity(limit = 10) {
+  return request(`/admin/recent-activity?limit=${limit}`, { method: 'GET' });
+}
+
 // Simplified request helpers (for useTutorials, etc.)
 export const useApi = () => ({
   get: (endpoint) => request(endpoint, { method: 'GET' }),
@@ -104,4 +121,12 @@ export const useApi = () => ({
   put: (endpoint, body) =>
     request(endpoint, { method: 'PUT', body: JSON.stringify(body) }),
   del: (endpoint) => request(endpoint, { method: 'DELETE' }),
+  
+  // Admin stats convenience methods
+  admin: {
+    getStats: () => getAdminStats(),
+    getUserGrowth: (months = 6) => getUserGrowth(months),
+    getLessonEngagement: (limit = 10) => getLessonEngagement(limit),
+    getRecentActivity: (limit = 10) => getRecentActivity(limit),
+  }
 });

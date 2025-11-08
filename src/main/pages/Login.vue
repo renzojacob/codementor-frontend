@@ -147,8 +147,11 @@ async function handleLogin() {
       token: data.tokens.access_token,
       role: data.user.role,
     })
-
-    router.push(data.user.role === 'admin' ? '/admin' : '/')
+    if (data.user.role === 'admin') {
+      window.location.href = '/admin.html'  // loads the admin SPA
+    } else {
+      router.push('/')
+    }
   } catch (err) {
     error.value = err.message
   } finally {
