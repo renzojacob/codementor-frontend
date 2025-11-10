@@ -4,12 +4,13 @@
     <h1 class="text-2xl font-bold mb-6">Choose a Language</h1>
 
     <div v-if="loading" class="text-gray-500">Loading...</div>
+    <div v-else-if="error" class="text-red-500">Error loading languages: {{ error }}</div>
     <div v-else class="grid grid-cols-2 md:grid-cols-3 gap-6">
       <RouterLink
         v-for="lang in languages"
         :key="lang.slug"
         :to="`/learn/${lang.slug}`"
-        class="p-6 border rounded hover:bg-green-50"
+        class="p-6 border rounded hover:bg-green-50 transition-colors"
       >
         <h2 class="text-xl font-bold mb-2">{{ lang.name }}</h2>
         <p class="text-sm text-gray-500">
@@ -22,9 +23,9 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { useTutorials } from '@/consumables/useTutorials'
+import { useTutorials } from '@/consumables'
 
-const { languages, fetchLanguages, loading } = useTutorials()
+const { languages, fetchLanguages, loading, error } = useTutorials()
 
 onMounted(() => {
   fetchLanguages()

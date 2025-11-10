@@ -1,3 +1,4 @@
+<!-- src/admin/components/charts/LessonEngagement.vue -->
 <template>
   <div class="h-64">
     <Bar :data="chartData" :options="chartOptions" />

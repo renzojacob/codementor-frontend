@@ -74,15 +74,15 @@ import { ref, onMounted } from 'vue'
 import { BookOpenIcon, UserIcon, CodeIcon, ActivityIcon } from 'lucide-vue-next'
 import UserGrowth from '../components/charts/UserGrowth.vue'
 import LessonEngagement from '../components/charts/LessonEngagement.vue'
-import { useApi } from '@/consumables/useApi' // adjust path if different
+import { useApi } from '@/consumables'
 
-const { get } = useApi() // expects get(url) => JSON
+const { get, loading, error } = useApi()
 
 const stats = ref([
-  { label: 'Active Users', value: '—', icon: UserIcon, iconBg: 'bg-[color:var(--pri-500)]' },
-  { label: 'Lessons Published', value: '—', icon: BookOpenIcon, iconBg: 'bg-[color:var(--acc-ind-500)]' },
-  { label: 'Challenges Solved', value: '—', icon: CodeIcon, iconBg: 'bg-[color:var(--acc-grn-500)]' },
-  { label: 'Avg. Completion Rate', value: '—', icon: ActivityIcon, iconBg: 'bg-[color:var(--acc-org-500)]' },
+  { label: 'Active Users', value: '\u2014', icon: UserIcon, iconBg: 'bg-[color:var(--pri-500)]' },
+  { label: 'Lessons Published', value: '\u2014', icon: BookOpenIcon, iconBg: 'bg-[color:var(--acc-ind-500)]' },
+  { label: 'Challenges Solved', value: '\u2014', icon: CodeIcon, iconBg: 'bg-[color:var(--acc-grn-500)]' },
+  { label: 'Avg. Completion Rate', value: '\u2014', icon: ActivityIcon, iconBg: 'bg-[color:var(--acc-org-500)]' },
 ])
 
 const recentActivity = ref([])
@@ -103,7 +103,7 @@ async function loadStats() {
 
 async function loadUserGrowth() {
   try {
-    const rows = await get('/admin/user-growth?months=6') // returns [{period: '2025-05', count: 10}, ...]
+    const rows = await get('/admin/user-growth?months=6')
     userGrowthSeries.value.labels = rows.map(r => r.period)
     userGrowthSeries.value.data = rows.map(r => Number(r.count))
   } catch (e) {
@@ -113,7 +113,7 @@ async function loadUserGrowth() {
 
 async function loadLessonEngagement() {
   try {
-    const rows = await get('/admin/lesson-engagement?limit=8') // returns [{id, title, views}, ...]
+    const rows = await get('/admin/lesson-engagement?limit=8')
     lessonEngagementData.value.labels = rows.map(r => r.title)
     lessonEngagementData.value.data = rows.map(r => Number(r.views))
   } catch (e) {
@@ -133,4 +133,3 @@ onMounted(async () => {
   await Promise.all([loadStats(), loadUserGrowth(), loadLessonEngagement(), loadRecentActivity()])
 })
 </script>
-

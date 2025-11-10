@@ -1,4 +1,3 @@
-<!-- src/main/pages/learn/components/LessonContent.vue -->
 <template>
   <!-- Loading -->
   <div v-if="loading" class="text-gray-500 text-center py-10">
@@ -22,11 +21,10 @@
 
     <!-- Table of Contents -->
     <ul class="mb-6 text-sm text-gray-500">
-  <li v-for="(s, i) in lesson.sections" :key="i">
-    <a :href="`#section-${i}`" class="hover:text-blue-600">{{ s.subtitle }}</a>
-  </li>
-</ul>
-
+      <li v-for="(s, i) in lesson.sections" :key="i">
+        <a :href="`#section-${i}`" class="hover:text-blue-600">{{ s.subtitle }}</a>
+      </li>
+    </ul>
 
     <!-- Title -->
     <h1 class="text-4xl font-bold mb-6 text-gray-900">
@@ -67,8 +65,6 @@
           </RouterLink>
         </div>
       </div>
-
-
     </section>
   </article>
 
@@ -84,7 +80,7 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-import { useApi } from '@/consumables/useApi'
+import { useApi } from '@/consumables'
 import MarkdownIt from 'markdown-it'
 
 const md = new MarkdownIt()
@@ -94,22 +90,17 @@ const props = defineProps({
   topic: { type: String, required: true },
 })
 
-const { get } = useApi()
+const { get, loading, error } = useApi()
 const lesson = ref(null)
-const loading = ref(false)
-const error = ref(null)
 
 async function fetchLesson() {
   try {
-    loading.value = true
-    error.value = null
+    lesson.value = null
     const res = await get(`/languages/${props.lang}/lessons/${props.topic}`)
     lesson.value = res
   } catch (err) {
-    console.error(err)
-    error.value = err.message
-  } finally {
-    loading.value = false
+    console.error('Failed to fetch lesson:', err)
+    // Error is already handled by useApi composable
   }
 }
 

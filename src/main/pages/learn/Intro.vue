@@ -1,4 +1,3 @@
-<!-- src/main/pages/learn/languages/javascript/Intro.vue -->
 <template>
   <div>
     <h1 class="text-3xl font-bold mb-4">{{ lesson?.title }}</h1>
@@ -13,7 +12,7 @@
         :to="`/learn/${route.params.lang}/try?example=${lesson.path}`"
         class="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded"
       >
-        Try it Yourself »
+        Try it Yourself �
       </RouterLink>
     </div>
   </div>
@@ -22,14 +21,18 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useApi } from '@/consumables/useApi'
+import { useApi } from '@/consumables'
 
 const route = useRoute()
-const { get } = useApi()
+const { get, loading, error } = useApi()
 const lesson = ref(null)
 
 onMounted(async () => {
-  const res = await get(`/lessons/${route.params.topic}`)
-  lesson.value = res.data
+  try {
+    const res = await get(`/lessons/${route.params.topic}`)
+    lesson.value = res
+  } catch (err) {
+    console.error('Failed to load lesson:', err)
+  }
 })
 </script>

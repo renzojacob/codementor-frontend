@@ -3,28 +3,30 @@
   <div class="flex h-screen bg-white text-gray-800">
     <!-- Sidebar Component -->
     <LessonSidebar :lang="lang" :lessons="lessons" :loading="loading" :languageTitle="languageTitle"
-      :showSidebar="showSidebar" @toggleSidebar="toggleSidebar" />
+      :showSidebar="showSidebar" @toggle-sidebar="toggleSidebar" />
 
     <!-- Main Content -->
     <main class="flex-1 overflow-y-auto px-4 md:px-8 lg:px-12 py-8">
       <RouterView />
     </main>
-
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useTutorials } from '@/consumables/useTutorials'
+import { useTutorials } from '@/consumables'
 import LessonSidebar from './components/LessonSidebar.vue'
 
 const route = useRoute()
 const showSidebar = ref(false)
 const lang = computed(() => route.params.lang)
-const { lessons, fetchLessons, loading } = useTutorials()
+const { lessons, fetchLessons, loading, error } = useTutorials()
 
-const languageTitle = computed(() => lang.value?.toUpperCase() || 'Language')
+const languageTitle = computed(() => {
+  if (!lang.value) return 'Language'
+  return lang.value.charAt(0).toUpperCase() + lang.value.slice(1)
+})
 
 function toggleSidebar() {
   showSidebar.value = !showSidebar.value
@@ -41,7 +43,6 @@ watch(lang, (newLang) => {
 </script>
 
 <style scoped>
-/* Keep your transition styles to match LessonSidebar.vue */
 .slide-enter-active,
 .slide-leave-active {
   transition: transform 0.3s ease, opacity 0.3s ease;

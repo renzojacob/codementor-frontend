@@ -1,4 +1,3 @@
-<!-- src/main/pages/learn/components/LessonSidebar.vue -->
 <template>
     <div>
         <!-- Desktop Sidebar -->
@@ -7,8 +6,9 @@
 
             <nav v-if="!loading && lessons.length" class="space-y-2">
                 <RouterLink v-for="topic in lessons" :key="topic.path" :to="`/learn/${lang}/${topic.path}`"
-                    class="block px-2 py-1 rounded hover:bg-gray-200"
-                    active-class="bg-blue-100 text-blue-700 font-semibold">
+                    class="block px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+                    :class="{ 'bg-blue-100 text-blue-700 font-semibold': isActive(topic.path) }"
+                    @click="handleLinkClick">
                     {{ topic.title }}
                 </RouterLink>
             </nav>
@@ -26,14 +26,20 @@
 
         <!-- Slide-in Sidebar for mobile -->
         <transition name="slide">
-            <div v-if="showSidebar" class="fixed inset-0 bg-black/50 z-40" @click="$emit('toggleSidebar')">
-                <aside class="absolute top-0 left-0 w-64 h-full bg-gray-50 border-r p-4" @click.stop>
-                    <h2 class="text-lg font-semibold mb-4">{{ languageTitle }}</h2>
+            <div v-if="showSidebar" class="fixed inset-0 bg-black/50 z-40 md:hidden" @click="$emit('toggleSidebar')">
+                <aside class="absolute top-0 left-0 w-64 h-full bg-gray-50 border-r p-4 overflow-y-auto" @click.stop>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">{{ languageTitle }}</h2>
+                        <button @click="$emit('toggleSidebar')" class="p-1 hover:bg-gray-200 rounded">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
 
                     <nav v-if="!loading && lessons.length" class="space-y-2">
                         <RouterLink v-for="topic in lessons" :key="topic.path" :to="`/learn/${lang}/${topic.path}`"
-                            class="block px-2 py-1 rounded hover:bg-gray-200"
-                            active-class="bg-blue-100 text-blue-700 font-semibold" @click="$emit('toggleSidebar')">
+                            class="block px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+                            :class="{ 'bg-blue-100 text-blue-700 font-semibold': isActive(topic.path) }"
+                            @click="handleLinkClick">
                             {{ topic.title }}
                         </RouterLink>
                     </nav>
@@ -47,6 +53,10 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
 defineProps({
     lang: { type: String, required: true },
     lessons: { type: Array, required: true },
@@ -55,7 +65,15 @@ defineProps({
     showSidebar: { type: Boolean, default: false },
 })
 
-defineEmits(['toggleSidebar'])
+const emit = defineEmits(['toggleSidebar'])
+
+const isActive = (topicPath) => {
+    return route.params.topic === topicPath
+}
+
+const handleLinkClick = () => {
+    emit('toggleSidebar')
+}
 </script>
 
 <style scoped>

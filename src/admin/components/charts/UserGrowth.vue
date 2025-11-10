@@ -1,3 +1,4 @@
+<!-- src/admin/components/charts/UserGrowth.vue -->
 <template>
   <div class="h-64">
     <Line :data="chartData" :options="chartOptions" />

@@ -131,10 +131,11 @@
   </div>
 </template>
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, watch } from 'vue'
+import { useRouter, RouterLink } from 'vue-router'
+import { useAuth } from '@/consumables'
 
-const API_BASE = 'http://localhost:3000'
+const { register, loading, error } = useAuth()
 const router = useRouter()
 
 const username = ref('')
@@ -144,13 +145,16 @@ const confirm = ref('')
 const agree = ref(false)
 const showPassword = ref(false)
 const showConfirm = ref(false)
-const loading = ref(false)
-const error = ref('')
 
-async function handleRegister() {
-  error.value = ''
+// Clear error when user starts typing
+watch([username, email, password, confirm], () => {
+  if (error.value) {
+    error.value = ''
+  }
+})
 
-  // Validation
+const handleRegister = async () => {
+  // Client-side validation
   if (!agree.value) {
     error.value = 'You must agree to the Terms and Conditions.'
     return
@@ -159,34 +163,29 @@ async function handleRegister() {
     error.value = 'Passwords do not match.'
     return
   }
-
-  loading.value = true
+  if (password.value.length < 6) {
+    error.value = 'Password must be at least 6 characters long.'
+    return
+  }
 
   try {
-    // Use JSON for request body
-    const res = await fetch(`${API_BASE}/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: username.value,
-        email: email.value,
-        password: password.value,
-        role: 'user',
-      }),
-    })
+    const userData = {
+      username: username.value,
+      email: email.value,
+      password: password.value,
+      role: 'user',
+    }
 
-    const data = await res.json()
-
-    if (!res.ok) throw new Error(data.error || 'Registration failed')
-
-    // Alert user that registration & email were successful
-    alert(data.message || 'Registration successful! Check your email.')
-
+    const response = await register(userData)
+    
+    // Show success message
+    alert(response.message || 'Registration successful! Please check your email to verify your account.')
+    
+    // Redirect to login page
     router.push('/login')
   } catch (err) {
-    error.value = err.message
-  } finally {
-    loading.value = false
+    // Error is already handled by the useAuth composable
+    console.error('Registration failed:', err)
   }
 }
 </script>

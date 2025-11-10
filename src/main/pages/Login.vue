@@ -111,8 +111,8 @@
 import { ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useUserStore } from '../../store/user'
+import { useAuth } from '@/consumables'
 
-const API_BASE = 'http://localhost:3000'
 const username = ref('')
 const password = ref('')
 const showPassword = ref(false)
@@ -120,34 +120,18 @@ const error = ref('')
 const loading = ref(false)
 const router = useRouter()
 const user = useUserStore()
-
-function saveTokens({ access_token, refresh_token }) {
-  localStorage.setItem('access_token', access_token)
-  localStorage.setItem('refresh_token', refresh_token)
-}
+const { login: authLogin } = useAuth()
 
 async function handleLogin() {
   error.value = ''
   loading.value = true
   try {
-    const res = await fetch(`${API_BASE}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.value, password: password.value }),
-    })
-
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.error || 'Login failed')
-
-    saveTokens(data.tokens)
-    user.login({
-      id: data.user.id,
-      username: data.user.username,
-      email: data.user.email,
-      token: data.tokens.access_token,
-      role: data.user.role,
-    })
-    if (data.user.role === 'admin') {
+    const res = await authLogin(username.value, password.value)
+    
+    // The useAuth composable already saves tokens and updates the user store
+    // But we need to handle the admin redirect here
+    
+    if (user.role === 'admin') {
       window.location.href = '/admin.html'  // loads the admin SPA
     } else {
       router.push('/')

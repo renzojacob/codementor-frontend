@@ -39,31 +39,36 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useApi } from '@/consumables'
 
 const route = useRoute()
 const router = useRouter()
+const { get } = useApi()
+
 const message = ref('Verifying your email...')
 const isLoading = ref(true)
 const countdown = ref(5)
+const verificationError = ref('')
 
 onMounted(async () => {
   const token = route.query.token
   if (!token) {
     message.value = 'No verification token provided.'
+    verificationError.value = 'Please check your verification link and try again.'
     isLoading.value = false
     return
   }
 
   try {
-    const res = await fetch(`http://localhost:3000/verify-email?token=${token}`)
-    const data = await res.json()
-    message.value = data.message || 'Email verified successfully!'
+    const response = await get(`/verify-email?token=${token}`)
+    message.value = response.message || 'Email verified successfully!'
   } catch (err) {
-    message.value = 'Verification failed. Please try again.'
+    message.value = 'Verification failed'
+    verificationError.value = err.message || 'Please try again or request a new verification email.'
   } finally {
     isLoading.value = false
     
-    // Start countdown
+    // Start countdown to redirect
     const timer = setInterval(() => {
       countdown.value--
       if (countdown.value <= 0) {
