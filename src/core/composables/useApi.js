@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { axiosInstance } from '../http/axios'
-import { authAPI, adminAPI, tutorialsAPI } from '../api'
+import { authAPI, adminAPI, learnAPI } from '../api'
 
 export const useApi = () => {
   const loading = ref(false)
@@ -54,29 +54,29 @@ export const useApi = () => {
     tutorials: {
       // Languages
       languages: {
-        getAll: () => execute(tutorialsAPI.languages.getAll),
-        get: (id) => execute(tutorialsAPI.languages.get, id),
-        create: (data) => execute(tutorialsAPI.languages.create, data),
-        update: (id, data) => execute(tutorialsAPI.languages.update, id, data),
-        delete: (id) => execute(tutorialsAPI.languages.delete, id),
+        getAll: () => execute(learnAPI.languages.getAll),
+        get: (id) => execute(learnAPI.languages.get, id),
+        create: (data) => execute(learnAPI.languages.create, data),
+        update: (id, data) => execute(learnAPI.languages.update, id, data),
+        delete: (id) => execute(learnAPI.languages.delete, id),
       },
       
       // Lessons
       lessons: {
-        getByLanguage: (langSlug) => execute(tutorialsAPI.lessons.getByLanguage, langSlug),
-        get: (id) => execute(tutorialsAPI.lessons.get, id),
-        create: (data) => execute(tutorialsAPI.lessons.create, data),
-        update: (id, data) => execute(tutorialsAPI.lessons.update, id, data),
-        delete: (id) => execute(tutorialsAPI.lessons.delete, id),
+        getByLanguage: (langSlug) => execute(learnAPI.lessons.getByLanguage, langSlug),
+        get: (id) => execute(learnAPI.lessons.get, id),
+        create: (data) => execute(learnAPI.lessons.create, data),
+        update: (id, data) => execute(learnAPI.lessons.update, id, data),
+        delete: (id) => execute(learnAPI.lessons.delete, id),
       },
       
       // Tutorials
-      getAll: (params) => execute(tutorialsAPI.tutorials.getAll, params),
-      get: (id) => execute(tutorialsAPI.tutorials.get, id),
-      create: (data) => execute(tutorialsAPI.tutorials.create, data),
-      update: (id, data) => execute(tutorialsAPI.tutorials.update, id, data),
-      delete: (id) => execute(tutorialsAPI.tutorials.delete, id),
-      search: (query) => execute(tutorialsAPI.tutorials.search, query),
+      getAll: (params) => execute(learnAPI.tutorials.getAll, params),
+      get: (id) => execute(learnAPI.tutorials.get, id),
+      create: (data) => execute(learnAPI.tutorials.create, data),
+      update: (id, data) => execute(learnAPI.tutorials.update, id, data),
+      delete: (id) => execute(learnAPI.tutorials.delete, id),
+      search: (query) => execute(learnAPI.tutorials.search, query),
     }
   }
 }

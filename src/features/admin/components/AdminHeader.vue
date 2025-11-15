@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { useAuth } from '@/consumables/composables/useAuth'
+import { useAuth } from '@/core/composables/useAuth'
 import { useRouter } from 'vue-router'
 
 const { logout: authLogout } = useAuth()

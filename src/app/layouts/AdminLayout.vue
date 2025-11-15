@@ -7,13 +7,13 @@
     <div class="flex-1 flex flex-col">
       <AdminHeader />
       <main class="flex-1 p-4 overflow-auto">
-        <slot />
+        <router-view />
       </main>
     </div>
   </div>
 </template>
 
 <script setup>
-import AdminSidebar from '../components/AdminSidebar.vue'
-import AdminHeader from '../components/AdminHeader.vue'
+import AdminSidebar from '@/features/admin/components/AdminSidebar.vue'
+import AdminHeader from '@/features/admin/components/AdminHeader.vue'
 </script>
