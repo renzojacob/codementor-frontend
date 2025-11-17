@@ -1,102 +1,50 @@
+<!-- src/features/main/pages/Challenges.vue -->
 <template>
-  <div>
-    <h1 class="text-2xl font-bold mb-6">Coding Challenges</h1>
+  <div class="p-6 space-y-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <h1 class="text-2xl font-bold text-[var(--gry-900)]">Challenges</h1>
 
-    <!-- Filters -->
-    <div class="flex flex-wrap gap-3 mb-6">
-      <select v-model="selectedDifficulty" class="border rounded px-3 py-1">
-        <option value="">All Difficulties</option>
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-      </select>
-
-      <select v-model="selectedLanguage" class="border rounded px-3 py-1">
-        <option value="">All Languages</option>
-        <option value="javascript">JavaScript</option>
-        <option value="python">Python</option>
-        <option value="java">Java</option>
-        <option value="csharp">C#</option>
-        <option value="php">PHP</option>
-      </select>
+      <ChallengeSearch v-model="searchQuery" />
     </div>
 
-    <!-- Challenge List -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div
-        v-for="challenge in paginatedChallenges"
-        :key="challenge.id"
-        class="p-4 rounded-lg shadow-sm bg-white hover:shadow-md transition-shadow"
-      >
-        <h2 class="font-semibold text-lg mb-1">{{ challenge.title }}</h2>
-        <div class="flex items-center gap-2 text-sm mb-2">
-          <span :class="difficultyClass(challenge.difficulty)">
-            {{ challenge.difficulty }}
-          </span>
-          <span class="text-gray-500">• {{ challenge.language }}</span>
-        </div>
-        <div class="flex justify-between items-center text-gray-500 text-sm">
-          <span>{{ challenge.submissions }} submissions</span>
-          <router-link
-            :to="`/challenge/${challenge.id}`"
-            class="text-blue-600 hover:underline"
-          >
-            Solve
-          </router-link>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pagination -->
-    <Pagination
-      :total-items="filteredChallenges.length"
-      :page-size="pageSize"
-      v-model:current-page="currentPage"
-      class="mt-6"
+    <ChallengeFilters
+      :active="activeFilter"
+      @update="val => activeFilter = val"
     />
+
+    <ChallengeGrid :items="filteredChallenges" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import Pagination from '@/components/ui/Pagination.vue';
+import { ref, computed } from 'vue'
 
-// Sample challenges
+import ChallengeGrid from '../components/ChallengeGrid.vue'
+import ChallengeSearch from '../components/ChallengeSearch.vue'
+import ChallengeFilters from '../components/ChallengeFilters.vue'
+
+// mock data \u2014 replace with API later
 const challenges = ref([
-  { id: 1, title: 'FizzBuzz', difficulty: 'easy', language: 'javascript', submissions: 102 },
-  { id: 2, title: 'Two Sum', difficulty: 'medium', language: 'python', submissions: 256 },
-  { id: 3, title: 'Palindrome Checker', difficulty: 'easy', language: 'java', submissions: 78 },
-  { id: 4, title: 'Binary Tree Inorder', difficulty: 'hard', language: 'csharp', submissions: 43 },
-  // Add more as needed
-]);
+  { id: 1, title: "Reverse Linked List", slug: "reverse-linked-list", difficulty: "easy", xp: 50, solved: true },
+  { id: 2, title: "Binary Tree Paths", slug: "binary-tree-paths", difficulty: "medium", xp: 120, solved: false },
+  { id: 3, title: "LRU Cache", slug: "lru-cache", difficulty: "hard", xp: 200, solved: false },
+  { id: 4, title: "Two Sum", slug: "two-sum", difficulty: "easy", xp: 20, solved: true },
+  { id: 5, title: "Sort Colors", slug: "sort-colors", difficulty: "medium", xp: 70, solved: false },
+])
 
-const selectedDifficulty = ref('');
-const selectedLanguage = ref('');
-const currentPage = ref(1);
-const pageSize = ref(6);
+const searchQuery = ref("")
+const activeFilter = ref("all")
 
-// Filtered challenges
 const filteredChallenges = computed(() => {
-  return challenges.value.filter(challenge => {
-    return (!selectedDifficulty.value || challenge.difficulty === selectedDifficulty.value) &&
-           (!selectedLanguage.value || challenge.language === selectedLanguage.value);
-  });
-});
+  return challenges.value.filter(c => {
+    const matchesSearch = c.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesFilter =
+      activeFilter.value === "all"
+      || activeFilter.value === c.difficulty
+      || (activeFilter.value === "solved" && c.solved)
+      || (activeFilter.value === "unsolved" && !c.solved)
 
-// Paginated
-const paginatedChallenges = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return filteredChallenges.value.slice(start, end);
-});
-
-// Difficulty color class
-const difficultyClass = (level) => {
-  switch(level) {
-    case 'easy': return 'text-green-600 font-medium';
-    case 'medium': return 'text-yellow-500 font-medium';
-    case 'hard': return 'text-red-500 font-medium';
-    default: return '';
-  }
-};
+    return matchesSearch && matchesFilter
+  })
+})
 </script>
