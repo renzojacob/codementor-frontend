@@ -39,7 +39,7 @@
             <h3 class="text-xl font-semibold mb-2">{{ challenge.title }}</h3>
             <p class="text-gray-600 mb-4">{{ challenge.desc }}</p>
             <router-link :to="challenge.link" class="text-blue-600 font-medium hover:underline">
-              Solve Challenge \u2192
+              Solve Challenge ->
             </router-link>
           </div>
         </div>
