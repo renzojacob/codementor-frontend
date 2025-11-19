@@ -7,6 +7,8 @@ import pinia from '@/core/store'
 
 // Import Tailwind CSS file only
 import '../styles/main.css'
+import '../styles/variables.css'
+
 
 
 // FontAwesome
