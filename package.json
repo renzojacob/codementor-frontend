@@ -9,10 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/lang-php": "^6.0.2",
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.8",
     "@fortawesome/fontawesome-free": "^7.1.0",
     "axios": "^1.13.0",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.1",
+    "codemirror": "^6.0.2",
     "dayjs": "^1.11.18",
     "lucide-vue-next": "^0.553.0",
     "markdown-it": "^14.1.0",

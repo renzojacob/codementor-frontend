@@ -8,7 +8,7 @@
           <p class="text-gray-600 mt-2">Comprehensive platform insights and performance metrics</p>
         </div>
         <div class="flex items-center gap-3">
-          <select v-model="timeRange" @change="loadAllAnalytics" 
+          <select v-model="timeRange" @change="handleTimeRangeChange" 
             class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <option value="7d">Last 7 Days</option>
             <option value="30d">Last 30 Days</option>
@@ -25,18 +25,28 @@
       </div>
     </div>
 
+    <!-- Error State -->
+    <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="text-red-800">Failed to load analytics: {{ error }}</span>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
     </div>
 
     <!-- Platform Overview KPIs -->
-    <div v-if="!loading" class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div v-if="!loading && !error" class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">Total Users</p>
-            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.totalUsers.toLocaleString() }}</p>
+            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.totalUsers?.toLocaleString() || 0 }}</p>
           </div>
           <div class="p-3 bg-blue-100 rounded-lg">
             <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,14 +54,14 @@
             </svg>
           </div>
         </div>
-        <p class="text-xs text-green-600 mt-2">+{{ platformOverview.userGrowth }}% growth</p>
+        <p class="text-xs text-green-600 mt-2">+{{ platformOverview.userGrowth || 0 }}% growth</p>
       </div>
 
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">Active Sessions</p>
-            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.activeSessions.toLocaleString() }}</p>
+            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.activeSessions?.toLocaleString() || 0 }}</p>
           </div>
           <div class="p-3 bg-green-100 rounded-lg">
             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +76,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">Submissions</p>
-            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.totalSubmissions.toLocaleString() }}</p>
+            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.totalSubmissions?.toLocaleString() || 0 }}</p>
           </div>
           <div class="p-3 bg-purple-100 rounded-lg">
             <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,14 +84,14 @@
             </svg>
           </div>
         </div>
-        <p class="text-xs text-green-600 mt-2">{{ platformOverview.submissionSuccessRate }}% success rate</p>
+        <p class="text-xs text-green-600 mt-2">{{ platformOverview.submissionSuccessRate || 0 }}% success rate</p>
       </div>
 
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">Total Lessons</p>
-            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.totalLessons.toLocaleString() }}</p>
+            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.totalLessons?.toLocaleString() || 0 }}</p>
           </div>
           <div class="p-3 bg-orange-100 rounded-lg">
             <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,12 +99,12 @@
             </svg>
           </div>
         </div>
-        <p class="text-xs text-gray-500 mt-2">{{ platformOverview.totalChallenges }} challenges</p>
+        <p class="text-xs text-gray-500 mt-2">{{ platformOverview.totalChallenges || 0 }} challenges</p>
       </div>
     </div>
 
     <!-- Analytics Sections Grid -->
-    <div v-if="!loading" class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+    <div v-if="!loading && !error" class="grid grid-cols-1 xl:grid-cols-2 gap-8">
       <!-- User Growth Analytics -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div class="flex justify-between items-center mb-6">
@@ -113,19 +123,19 @@
         
         <div class="grid grid-cols-2 gap-4 mb-6">
           <div class="text-center p-4 bg-blue-50 rounded-lg">
-            <div class="text-2xl font-bold text-blue-700">{{ userGrowth.dailyNewUsers }}</div>
+            <div class="text-2xl font-bold text-blue-700">{{ userGrowthStats.dailyNewUsers || 0 }}</div>
             <div class="text-sm text-blue-600">Daily New Users</div>
           </div>
           <div class="text-center p-4 bg-green-50 rounded-lg">
-            <div class="text-2xl font-bold text-green-700">{{ userGrowth.weeklyNewUsers }}</div>
+            <div class="text-2xl font-bold text-green-700">{{ userGrowthStats.weeklyNewUsers || 0 }}</div>
             <div class="text-sm text-green-600">Weekly New Users</div>
           </div>
           <div class="text-center p-4 bg-purple-50 rounded-lg">
-            <div class="text-2xl font-bold text-purple-700">{{ userGrowth.monthlyGrowthRate }}%</div>
+            <div class="text-2xl font-bold text-purple-700">{{ userGrowthStats.monthlyGrowthRate || 0 }}%</div>
             <div class="text-sm text-purple-600">Monthly Growth</div>
           </div>
           <div class="text-center p-4 bg-orange-50 rounded-lg">
-            <div class="text-2xl font-bold text-orange-700">{{ userGrowth.totalUsers }}</div>
+            <div class="text-2xl font-bold text-orange-700">{{ platformOverview.totalUsers?.toLocaleString() || 0 }}</div>
             <div class="text-sm text-orange-600">Total Users</div>
           </div>
         </div>
@@ -157,19 +167,19 @@
 
         <div class="grid grid-cols-2 gap-4 mb-6">
           <div class="text-center p-4 bg-gray-50 rounded-lg">
-            <div class="text-2xl font-bold text-gray-700">{{ submissionActivity.totalSubmissions }}</div>
+            <div class="text-2xl font-bold text-gray-700">{{ submissionActivity.totalSubmissions || 0 }}</div>
             <div class="text-sm text-gray-600">Total Submissions</div>
           </div>
           <div class="text-center p-4 bg-green-50 rounded-lg">
-            <div class="text-2xl font-bold text-green-700">{{ submissionActivity.passedSubmissions }}</div>
+            <div class="text-2xl font-bold text-green-700">{{ submissionActivity.passedSubmissions || 0 }}</div>
             <div class="text-sm text-green-600">Passed</div>
           </div>
           <div class="text-center p-4 bg-red-50 rounded-lg">
-            <div class="text-2xl font-bold text-red-700">{{ submissionActivity.failedSubmissions }}</div>
+            <div class="text-2xl font-bold text-red-700">{{ submissionActivity.failedSubmissions || 0 }}</div>
             <div class="text-sm text-red-600">Failed</div>
           </div>
           <div class="text-center p-4 bg-blue-50 rounded-lg">
-            <div class="text-2xl font-bold text-blue-700">{{ submissionActivity.successRate }}%</div>
+            <div class="text-2xl font-bold text-blue-700">{{ submissionActivity.successRate || 0 }}%</div>
             <div class="text-sm text-blue-600">Success Rate</div>
           </div>
         </div>
@@ -202,14 +212,14 @@
         <!-- Top Learning Paths -->
         <div class="space-y-3">
           <h4 class="text-sm font-medium text-gray-700">Top Programming Languages</h4>
-          <div v-for="path in learningPathEngagement.topPaths" :key="path.language_name" 
+          <div v-for="path in learningPathEngagement.slice(0, 5)" :key="path.language_name" 
                class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div class="flex-1">
               <div class="text-sm font-medium text-gray-900">{{ path.language_name }}</div>
               <div class="text-xs text-gray-500">{{ path.active_users }} active users • {{ path.success_rate }}% success rate</div>
             </div>
             <div class="text-right">
-              <div class="text-sm font-semibold text-gray-900">{{ path.total_submissions.toLocaleString() }}</div>
+              <div class="text-sm font-semibold text-gray-900">{{ path.total_submissions?.toLocaleString() || 0 }}</div>
               <div class="text-xs text-gray-500">submissions</div>
             </div>
           </div>
@@ -239,19 +249,19 @@
         <!-- Challenge Stats -->
         <div class="grid grid-cols-2 gap-4">
           <div class="text-center p-3 bg-gray-50 rounded-lg">
-            <div class="text-lg font-bold text-gray-700">{{ challengeDifficulty.avgPassRate }}%</div>
+            <div class="text-lg font-bold text-gray-700">{{ challengeDifficulty.overall?.avg_pass_rate || 0 }}%</div>
             <div class="text-xs text-gray-600">Avg Pass Rate</div>
           </div>
           <div class="text-center p-3 bg-green-50 rounded-lg">
-            <div class="text-lg font-bold text-green-700">{{ challengeDifficulty.avgAttempts }}</div>
+            <div class="text-lg font-bold text-green-700">{{ challengeDifficulty.overall?.avg_attempts || 0 }}</div>
             <div class="text-xs text-green-600">Avg Attempts</div>
           </div>
           <div class="text-center p-3 bg-red-50 rounded-lg">
-            <div class="text-lg font-bold text-red-700">{{ challengeDifficulty.mostFailed }}</div>
+            <div class="text-lg font-bold text-red-700">{{ getMostFailedChallenge() }}</div>
             <div class="text-xs text-red-600">Most Failed</div>
           </div>
           <div class="text-center p-3 bg-blue-50 rounded-lg">
-            <div class="text-lg font-bold text-blue-700">{{ challengeDifficulty.mostCompleted }}</div>
+            <div class="text-lg font-bold text-blue-700">{{ getMostCompletedChallenge() }}</div>
             <div class="text-xs text-blue-600">Most Completed</div>
           </div>
         </div>
@@ -297,7 +307,7 @@
         <!-- Recent Lessons -->
         <div class="space-y-3">
           <h4 class="text-sm font-medium text-gray-700">Recently Added Lessons</h4>
-          <div v-for="lesson in lessonPerformance.topLessons" :key="lesson.id" 
+          <div v-for="lesson in lessonPerformance.slice(0, 5)" :key="lesson.id" 
                class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div class="flex-1">
               <div class="text-sm font-medium text-gray-900">{{ lesson.title }}</div>
@@ -313,12 +323,12 @@
     </div>
 
     <!-- Additional Analytics Sections -->
-    <div v-if="!loading" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+    <div v-if="!loading && !error" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
       <!-- Top Performers -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Performers</h3>
         <div class="space-y-3">
-          <div v-for="(user, index) in leaderboard.topPerformers" :key="user.id" 
+          <div v-for="(user, index) in topPerformers" :key="user.id" 
                class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
@@ -341,7 +351,7 @@
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
         <div class="space-y-3">
-          <div v-for="activity in recentActivity.activities" :key="activity.id" 
+          <div v-for="activity in recentActivity" :key="activity.id" 
                class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div class="flex-1">
               <div class="text-sm font-medium text-gray-900">{{ activity.description }}</div>
@@ -354,7 +364,7 @@
                 activity.type === 'challenge_solve' ? 'bg-blue-100 text-blue-800' :
                 'bg-gray-100 text-gray-800'
               ]">
-                {{ activity.type.replace('_', ' ') }}
+                {{ activity.type?.replace('_', ' ') || 'activity' }}
               </span>
             </div>
           </div>
@@ -366,6 +376,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useAnalytics } from '@/core/composables/useAnalytics'
 import {
   Chart,
   LineController,
@@ -402,6 +413,23 @@ Chart.register(
   Filler
 )
 
+// Use analytics composable
+const {
+  loading,
+  error,
+  platformOverview,
+  userGrowthData,
+  userGrowthStats,
+  submissionActivity,
+  learningPathEngagement,
+  challengeDifficulty,
+  lessonPerformance,
+  sessionAnalytics,
+  topPerformers,
+  recentActivity,
+  loadAllAnalytics
+} = useAnalytics()
+
 // Chart refs
 const userGrowthChart = ref(null)
 const submissionChart = ref(null)
@@ -420,7 +448,6 @@ let lessonChartInstance = null
 
 // Time range selector
 const timeRange = ref('30d')
-const loading = ref(true)
 
 // Chart type selectors
 const userGrowthChartType = ref('line')
@@ -429,176 +456,6 @@ const learningPathChartType = ref('bar')
 const sessionChartType = ref('bar')
 const challengeChartType = ref('bar')
 const lessonChartType = ref('bar')
-
-// Analytics data - updated to match backend structure
-const platformOverview = ref({
-  totalUsers: 0,
-  activeSessions: 0,
-  totalSubmissions: 0,
-  submissionSuccessRate: 0,
-  totalLessons: 0,
-  totalChallenges: 0,
-  userGrowth: 0
-})
-
-const userGrowth = ref({
-  dailyNewUsers: 0,
-  weeklyNewUsers: 0,
-  monthlyGrowthRate: 0,
-  totalUsers: 0,
-  timelineData: [],
-  timelineLabels: []
-})
-
-const submissionActivity = ref({
-  totalSubmissions: 0,
-  passedSubmissions: 0,
-  failedSubmissions: 0,
-  successRate: 0,
-  languageUsage: [],
-  dailySubmissions: [],
-  dailyLabels: []
-})
-
-const learningPathEngagement = ref({
-  topPaths: []
-})
-
-const challengeDifficulty = ref({
-  avgPassRate: 0,
-  avgAttempts: 0,
-  mostFailed: 'N/A',
-  mostCompleted: 'N/A',
-  challenges: []
-})
-
-const lessonPerformance = ref({
-  topLessons: []
-})
-
-const sessionAnalytics = ref({
-  dailyActivity: [],
-  peakHours: []
-})
-
-const leaderboard = ref({
-  topPerformers: []
-})
-
-const recentActivity = ref({
-  activities: []
-})
-
-// API functions
-async function loadAllAnalytics() {
-  try {
-    loading.value = true
-    await Promise.all([
-      loadPlatformOverview(),
-      loadUserGrowth(),
-      loadSubmissionActivity(),
-      loadLearningPaths(),
-      loadChallengeDifficulty(),
-      loadLessonPerformance(),
-      loadSessionStats(),
-      loadTopPerformers(),
-      loadRecentActivity()
-    ])
-    
-    // Recreate charts with real data
-    nextTick(() => {
-      createAllCharts()
-    })
-  } catch (error) {
-    console.error('Failed to load analytics:', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-async function loadPlatformOverview() {
-  const response = await fetch('/api/admin/analytics/overview')
-  const data = await response.json()
-  platformOverview.value = data
-}
-
-async function loadUserGrowth() {
-  const response = await fetch(`/api/admin/analytics/user-growth?range=${timeRange.value}`)
-  const data = await response.json()
-  
-  if (data.length > 0) {
-    userGrowth.value.timelineData = data.map(item => item.new_users)
-    userGrowth.value.timelineLabels = data.map(item => item.period)
-    userGrowth.value.dailyNewUsers = data[data.length - 1]?.new_users || 0
-    userGrowth.value.weeklyNewUsers = data.slice(-7).reduce((sum, item) => sum + item.new_users, 0)
-    userGrowth.value.totalUsers = data.reduce((sum, item) => sum + item.new_users, 0)
-    userGrowth.value.monthlyGrowthRate = platformOverview.value.userGrowth
-  }
-}
-
-async function loadSubmissionActivity() {
-  const response = await fetch(`/api/admin/analytics/submission-activity?range=${timeRange.value}`)
-  const data = await response.json()
-  
-  submissionActivity.value.dailyStats = data.dailyStats
-  submissionActivity.value.languageUsage = data.languageUsage
-  
-  if (data.dailyStats.length > 0) {
-    const latest = data.dailyStats[data.dailyStats.length - 1]
-    submissionActivity.value.totalSubmissions = latest.total_submissions
-    submissionActivity.value.passedSubmissions = latest.passed_submissions
-    submissionActivity.value.failedSubmissions = latest.failed_submissions
-    submissionActivity.value.successRate = (latest.passed_submissions / latest.total_submissions * 100).toFixed(1)
-    submissionActivity.value.dailySubmissions = data.dailyStats.map(item => item.total_submissions)
-    submissionActivity.value.dailyLabels = data.dailyStats.map(item => item.period)
-  }
-}
-
-async function loadLearningPaths() {
-  const response = await fetch('/api/admin/analytics/learning-paths')
-  const data = await response.json()
-  learningPathEngagement.value.topPaths = data
-}
-
-async function loadChallengeDifficulty() {
-  const response = await fetch('/api/admin/analytics/challenge-difficulty')
-  const data = await response.json()
-  
-  challengeDifficulty.value.challenges = data.challenges
-  challengeDifficulty.value.avgPassRate = data.overall.avg_pass_rate
-  challengeDifficulty.value.avgAttempts = data.overall.avg_attempts
-  
-  // Find most failed and most completed
-  if (data.challenges.length > 0) {
-    const sortedByPassRate = [...data.challenges].sort((a, b) => a.pass_rate - b.pass_rate)
-    challengeDifficulty.value.mostFailed = sortedByPassRate[0]?.title || 'N/A'
-    challengeDifficulty.value.mostCompleted = sortedByPassRate[sortedByPassRate.length - 1]?.title || 'N/A'
-  }
-}
-
-async function loadLessonPerformance() {
-  const response = await fetch('/api/admin/analytics/lesson-performance')
-  const data = await response.json()
-  lessonPerformance.value.topLessons = data
-}
-
-async function loadSessionStats() {
-  const response = await fetch('/api/admin/analytics/session-stats')
-  const data = await response.json()
-  sessionAnalytics.value = data
-}
-
-async function loadTopPerformers() {
-  const response = await fetch('/api/admin/analytics/top-performers?limit=5')
-  const data = await response.json()
-  leaderboard.value.topPerformers = data
-}
-
-async function loadRecentActivity() {
-  const response = await fetch('/api/admin/analytics/recent-activity?limit=5')
-  const data = await response.json()
-  recentActivity.value.activities = data
-}
 
 // Chart switching functions
 function switchUserGrowthChart(type) {
@@ -643,22 +500,26 @@ function switchLessonChart(type) {
   })
 }
 
-// Chart creation functions using real data
+// Chart creation functions using composable data
 function createUserGrowthChart() {
   if (userGrowthChartInstance) {
     userGrowthChartInstance.destroy()
   }
 
-  const ctx = userGrowthChart.value.getContext('2d')
+  const ctx = userGrowthChart.value?.getContext('2d')
+  if (!ctx || !userGrowthData.value || userGrowthData.value.length === 0) {
+    // Create empty chart or return early if no data
+    return
+  }
   
   if (userGrowthChartType.value === 'line') {
     userGrowthChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: userGrowth.value.timelineLabels,
+        labels: userGrowthData.value.map(item => item.period),
         datasets: [{
           label: 'New Users',
-          data: userGrowth.value.timelineData,
+          data: userGrowthData.value.map(item => item.new_users),
           borderColor: '#3b82f6',
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
           borderWidth: 2,
@@ -680,10 +541,10 @@ function createUserGrowthChart() {
     userGrowthChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: userGrowth.value.timelineLabels.slice(-6),
+        labels: userGrowthData.value.slice(-6).map(item => item.period),
         datasets: [{
           label: 'New Users',
-          data: userGrowth.value.timelineData.slice(-6),
+          data: userGrowthData.value.slice(-6).map(item => item.new_users),
           backgroundColor: '#3b82f6',
           borderColor: '#2563eb',
           borderWidth: 1
@@ -707,16 +568,18 @@ function createSubmissionChart() {
     submissionChartInstance.destroy()
   }
 
-  const ctx = submissionChart.value.getContext('2d')
+  const ctx = submissionChart.value?.getContext('2d')
+  if (!ctx) return
   
   if (submissionChartType.value === 'line') {
+    const dailyStats = submissionActivity.value.dailyStats || []
     submissionChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: submissionActivity.value.dailyLabels,
+        labels: dailyStats.map(item => item.period),
         datasets: [{
           label: 'Submissions',
-          data: submissionActivity.value.dailySubmissions,
+          data: dailyStats.map(item => item.total_submissions),
           borderColor: '#8b5cf6',
           backgroundColor: 'rgba(139, 92, 246, 0.1)',
           borderWidth: 2,
@@ -740,7 +603,7 @@ function createSubmissionChart() {
       data: {
         labels: ['Passed', 'Failed'],
         datasets: [{
-          data: [submissionActivity.value.passedSubmissions, submissionActivity.value.failedSubmissions],
+          data: [submissionActivity.value.passedSubmissions || 0, submissionActivity.value.failedSubmissions || 0],
           backgroundColor: ['#10b981', '#ef4444'],
           borderColor: ['#059669', '#dc2626'],
           borderWidth: 1
@@ -757,12 +620,13 @@ function createSubmissionChart() {
       }
     })
   } else {
+    const languageUsage = submissionActivity.value.languageUsage || []
     submissionChartInstance = new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: submissionActivity.value.languageUsage.map(l => l.language),
+        labels: languageUsage.map(l => l.language),
         datasets: [{
-          data: submissionActivity.value.languageUsage.map(l => l.percentage),
+          data: languageUsage.map(l => l.percentage),
           backgroundColor: [
             '#3b82f6',
             '#10b981',
@@ -792,8 +656,10 @@ function createLearningPathChart() {
     learningPathChartInstance.destroy()
   }
 
-  const ctx = learningPathChart.value.getContext('2d')
-  const paths = learningPathEngagement.value.topPaths.slice(0, 5)
+  const ctx = learningPathChart.value?.getContext('2d')
+  if (!ctx) return
+
+  const paths = learningPathEngagement.value.slice(0, 5)
   
   if (learningPathChartType.value === 'bar') {
     learningPathChartInstance = new Chart(ctx, {
@@ -855,8 +721,10 @@ function createChallengeChart() {
     challengeChartInstance.destroy()
   }
 
-  const ctx = challengeChart.value.getContext('2d')
-  const challenges = challengeDifficulty.value.challenges.slice(0, 5)
+  const ctx = challengeChart.value?.getContext('2d')
+  if (!ctx) return
+
+  const challenges = challengeDifficulty.value.challenges?.slice(0, 5) || []
   
   if (challengeChartType.value === 'bar') {
     challengeChartInstance = new Chart(ctx, {
@@ -920,17 +788,18 @@ function createSessionChart() {
     sessionChartInstance.destroy()
   }
 
-  const ctx = sessionChart.value.getContext('2d')
+  const ctx = sessionChart.value?.getContext('2d')
+  if (!ctx) return
   
   if (sessionChartType.value === 'bar') {
-    const dailyData = sessionAnalytics.value.dailyActivity.slice(-7)
+    const dailyActivity = sessionAnalytics.value.dailyActivity?.slice(-7) || []
     sessionChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: dailyData.map(d => d.date),
+        labels: dailyActivity.map(d => d.date),
         datasets: [{
           label: 'Unique Users',
-          data: dailyData.map(d => d.unique_users),
+          data: dailyActivity.map(d => d.unique_users),
           backgroundColor: '#f59e0b',
           borderColor: '#d97706',
           borderWidth: 1
@@ -947,14 +816,14 @@ function createSessionChart() {
       }
     })
   } else {
-    const peakData = sessionAnalytics.value.peakHours
+    const peakHours = sessionAnalytics.value.peakHours || []
     sessionChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: peakData.map(p => `${p.hour}:00`),
+        labels: peakHours.map(p => `${p.hour}:00`),
         datasets: [{
           label: 'Submissions',
-          data: peakData.map(p => p.submissions),
+          data: peakHours.map(p => p.submissions),
           borderColor: '#f59e0b',
           backgroundColor: 'rgba(245, 158, 11, 0.1)',
           borderWidth: 2,
@@ -980,13 +849,15 @@ function createLessonChart() {
     lessonChartInstance.destroy()
   }
 
-  const ctx = lessonChart.value.getContext('2d')
-  const lessons = lessonPerformance.value.topLessons
+  const ctx = lessonChart.value?.getContext('2d')
+  if (!ctx) return
+
+  const lessons = lessonPerformance.value
   
   lessonChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: lessons.map(l => l.title.split(' ').slice(0, 2).join(' ')),
+      labels: lessons.map(l => l.title?.split(' ').slice(0, 2).join(' ') || 'Lesson'),
       datasets: [{
         label: 'Order Index',
         data: lessons.map(l => l.order_index),
@@ -1016,6 +887,20 @@ function formatTime(dateString) {
   return new Date(dateString).toLocaleTimeString()
 }
 
+function getMostFailedChallenge() {
+  const challenges = challengeDifficulty.value.challenges || []
+  if (challenges.length === 0) return 'N/A'
+  const sorted = [...challenges].sort((a, b) => a.pass_rate - b.pass_rate)
+  return sorted[0]?.title || 'N/A'
+}
+
+function getMostCompletedChallenge() {
+  const challenges = challengeDifficulty.value.challenges || []
+  if (challenges.length === 0) return 'N/A'
+  const sorted = [...challenges].sort((a, b) => b.pass_rate - a.pass_rate)
+  return sorted[0]?.title || 'N/A'
+}
+
 function createAllCharts() {
   createUserGrowthChart()
   createSubmissionChart()
@@ -1025,6 +910,14 @@ function createAllCharts() {
   createLessonChart()
 }
 
+function handleTimeRangeChange() {
+  loadAllAnalytics(timeRange.value).then(() => {
+    nextTick(() => {
+      createAllCharts()
+    })
+  })
+}
+
 function exportReport() {
   console.log('Exporting analytics report...')
   alert('Export functionality would generate a comprehensive report here!')
@@ -1032,7 +925,11 @@ function exportReport() {
 
 // Lifecycle
 onMounted(() => {
-  loadAllAnalytics()
+  loadAllAnalytics(timeRange.value).then(() => {
+    nextTick(() => {
+      createAllCharts()
+    })
+  })
 })
 
 onUnmounted(() => {

@@ -18,6 +18,7 @@ export function setupGuards(router) {
     if (guestOnly && isAuthenticated) {
       return next({ name: 'Dashboard' }) // or wherever you want logged users to go
     }
+    // Redirect to not found page
 
     // 3️⃣ Otherwise, proceed normally
     next()

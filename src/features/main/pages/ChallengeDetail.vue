@@ -1,33 +1,31 @@
+<!-- src/features/main/pages/ChallengeDetail.vue -->
 <template>
   <div class="p-6 space-y-6">
-    <ProblemHeader
-      :title="problem.title"
-      :difficulty="problem.difficulty"
+    <ProblemHeader 
+      :title="problem.title" 
+      :difficulty="problem.difficulty" 
       :solved="problem.solved"
-      :tags="problem.tags"
+      :tags="problem.tags" 
     />
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Left: Description -->
       <div class="lg:col-span-2 space-y-6">
         <ProblemMeta :meta="problem.meta" />
-
         <ProblemDescription :body="problem.body" :examples="problem.examples" />
-
         <HintsPanel :hints="problem.hints" />
       </div>
 
       <!-- Right: Editor + Testcases + Submissions -->
       <aside class="space-y-6">
-        <CodeEditorWrapper
-          v-model="code"
-          :language="language"
+        <CodeEditorWrapper 
+          v-model="code" 
+          :language="language" 
           :available-langs="availableLangs"
-          @submit="runAndSubmit"
+          @submit="runAndSubmit" 
         />
 
         <TestCasesPanel :cases="problem.testcases" :results="testResults" />
-
         <SubmissionsList :submissions="submissions" />
       </aside>
     </div>
@@ -35,9 +33,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useChallenges } from '@/core/composables/useChallenges'
+import { useLearn } from '@/core/composables/useLearn'
 
 import ProblemHeader from '../components/ProblemHeader.vue'
 import ProblemMeta from '../components/ProblemMeta.vue'
@@ -47,11 +46,15 @@ import TestCasesPanel from '../components/TestCasesPanel.vue'
 import SubmissionsList from '../components/SubmissionsList.vue'
 import HintsPanel from '../components/HintsPanel.vue'
 
-// route param (auto-detect id or slug)
+// Route
 const route = useRoute()
-const value = route.params.slug || route.params.id
+const challengeId = route.params.slug || route.params.id
 
-// reactive state
+// Composables
+const { languages, fetchLanguages } = useLearn()
+const { fetchChallenge } = useChallenges()
+
+// Reactive state
 const problem = reactive({
   id: null,
   slug: '',
@@ -72,43 +75,32 @@ const problem = reactive({
   testcases: [],
 })
 
-const availableLangs = ['javascript', 'python', 'cpp']
-const language = ref('javascript')
-const code = ref(`// write your ${language.value} solution here`)
+// Computed
+const availableLangs = computed(() => 
+  Array.isArray(languages.value) ? languages.value.map(l => l.slug) : []
+)
+
+// Refs
+const language = ref('')
+const code = ref('')
 const testResults = ref([])
 const submissions = ref([])
 
-const { fetchChallenge } = useChallenges()
-
-onMounted(async () => {
-  const res = await fetchChallenge(value)
-  if (!res) return
-
-  Object.assign(problem, {
-    id: res.id,
-    slug: res.slug,
-    title: res.title,
-    difficulty: res.difficulty,
-    solved: res.solved,
-    tags: res.tags,
-    meta: {
-      xp: res.xp_reward,
-      timeLimit: res.time_limit,
-      memoryLimit: res.memory_limit,
-      submissions: res.total_submissions,
-      accepted: res.accepted_submissions,
-    },
-    body: res.description,
-    examples: res.examples,
-    hints: res.hints,
-    testcases: res.testcases
-  })
-
-  submissions.value = res.submissions
+// Watchers
+watch(availableLangs, (newLangs) => {
+  if (newLangs.length > 0 && !language.value) {
+    language.value = newLangs[0]
+    updateCodeTemplate()
+  }
 })
 
-// simulate run & submit
-function runAndSubmit({ action = 'run' } = {}) {
+// Methods
+const updateCodeTemplate = () => {
+  code.value = `// write your ${language.value} solution here`
+}
+
+const runAndSubmit = ({ action = 'run' } = {}) => {
+  // Initialize test results
   testResults.value = problem.testcases.map((t) => ({
     id: t.id,
     name: t.name,
@@ -116,6 +108,7 @@ function runAndSubmit({ action = 'run' } = {}) {
     details: '',
   }))
 
+  // Simulate API call
   setTimeout(() => {
     testResults.value = problem.testcases.map((t) => ({
       id: t.id,
@@ -135,5 +128,34 @@ function runAndSubmit({ action = 'run' } = {}) {
     }
   }, 700)
 }
-</script>
 
+// Lifecycle
+onMounted(async () => {
+  await fetchLanguages()
+  
+  const challenge = await fetchChallenge(challengeId)
+  if (!challenge) return
+
+  Object.assign(problem, {
+    id: challenge.id,
+    slug: challenge.slug,
+    title: challenge.title,
+    difficulty: challenge.difficulty,
+    solved: challenge.solved,
+    tags: challenge.tags,
+    meta: {
+      xp: challenge.xp_reward,
+      timeLimit: challenge.time_limit,
+      memoryLimit: challenge.memory_limit,
+      submissions: challenge.total_submissions,
+      accepted: challenge.accepted_submissions,
+    },
+    body: challenge.description,
+    examples: challenge.examples,
+    hints: challenge.hints,
+    testcases: challenge.testcases
+  })
+
+  submissions.value = challenge.submissions || []
+})
+</script>

@@ -16,9 +16,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'index.html'),
-        admin: path.resolve(__dirname, 'admin.html'),
-        api: path.resolve(__dirname, 'api.html'),
+        main: path.resolve(__dirname, 'index.html')
       },
       output: {
         manualChunks(id) {

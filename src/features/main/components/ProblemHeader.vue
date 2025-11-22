@@ -23,9 +23,10 @@
     </div>
 
     <div class="flex items-center gap-3">
+      <router-link to="/app/challenges">
       <button class="px-3 py-2 rounded-md border border-[var(--card-border)] hover:bg-[var(--pri-50)] text-sm">
-        Discuss
-      </button>
+        Cancel
+      </button></router-link>
 
       <button class="px-3 py-2 rounded-md bg-[var(--pri-600)] text-white hover:bg-[var(--pri-700)] text-sm">
         Submit Solution

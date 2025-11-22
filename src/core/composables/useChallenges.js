@@ -40,7 +40,6 @@ export function useChallenges() {
     try {
       const res = await getChallenge(value)
       const data = res.data
-
       return {
         id: data.id,
         slug: data.slug,

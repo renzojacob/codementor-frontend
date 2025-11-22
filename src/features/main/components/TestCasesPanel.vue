@@ -13,7 +13,7 @@
           <div v-if="resultFor(c.id)" class="text-sm font-semibold" :class="resultFor(c.id).status === 'Passed' ? 'text-[var(--acc-grn-600)]' : 'text-[var(--acc-red-600)]'">
             {{ resultFor(c.id).status }}
           </div>
-          <div class="text-xs text-[var(--gry-500)]">Expected: <span class="font-mono">{{ c.expected }}</span></div>
+          <div class="text-xs text-[var(--gry-500)]">Expected: <span class="font-mono">{{ c.expected_output }}</span></div>
         </div>
       </li>
     </ul>
