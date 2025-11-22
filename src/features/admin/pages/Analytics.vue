@@ -25,8 +25,13 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
     <!-- Platform Overview KPIs -->
-    <div class="grid grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+    <div v-if="!loading" class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div class="flex items-center justify-between">
           <div>
@@ -39,7 +44,7 @@
             </svg>
           </div>
         </div>
-        <p class="text-xs text-green-600 mt-2">+{{ platformOverview.userGrowth }}% this month</p>
+        <p class="text-xs text-green-600 mt-2">+{{ platformOverview.userGrowth }}% growth</p>
       </div>
 
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -75,51 +80,21 @@
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600">Lessons Completed</p>
-            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.lessonsCompleted.toLocaleString() }}</p>
+            <p class="text-sm font-medium text-gray-600">Total Lessons</p>
+            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.totalLessons.toLocaleString() }}</p>
           </div>
           <div class="p-3 bg-orange-100 rounded-lg">
             <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-        </div>
-        <p class="text-xs text-green-600 mt-2">+{{ platformOverview.completionGrowth }}% growth</p>
-      </div>
-
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600">AI Interactions</p>
-            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.aiInteractions.toLocaleString() }}</p>
-          </div>
-          <div class="p-3 bg-indigo-100 rounded-lg">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
-          </div>
-        </div>
-        <p class="text-xs text-gray-500 mt-2">{{ platformOverview.avgAiResponseTime }}s avg response</p>
-      </div>
-
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600">Enrollments</p>
-            <p class="text-2xl font-bold text-gray-900">{{ platformOverview.totalEnrollments.toLocaleString() }}</p>
-          </div>
-          <div class="p-3 bg-red-100 rounded-lg">
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
             </svg>
           </div>
         </div>
-        <p class="text-xs text-green-600 mt-2">{{ platformOverview.enrollmentCompletionRate }}% completion rate</p>
+        <p class="text-xs text-gray-500 mt-2">{{ platformOverview.totalChallenges }} challenges</p>
       </div>
     </div>
 
     <!-- Analytics Sections Grid -->
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+    <div v-if="!loading" class="grid grid-cols-1 xl:grid-cols-2 gap-8">
       <!-- User Growth Analytics -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div class="flex justify-between items-center mb-6">
@@ -132,10 +107,6 @@
             <button @click="switchUserGrowthChart('bar')" 
               :class="['px-3 py-1 rounded-lg text-sm transition', userGrowthChartType === 'bar' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-100']">
               Monthly
-            </button>
-            <button @click="switchUserGrowthChart('doughnut')" 
-              :class="['px-3 py-1 rounded-lg text-sm transition', userGrowthChartType === 'doughnut' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-100']">
-              Status
             </button>
           </div>
         </div>
@@ -154,8 +125,8 @@
             <div class="text-sm text-purple-600">Monthly Growth</div>
           </div>
           <div class="text-center p-4 bg-orange-50 rounded-lg">
-            <div class="text-2xl font-bold text-orange-700">{{ userGrowth.returningUsers }}</div>
-            <div class="text-sm text-orange-600">Returning Users</div>
+            <div class="text-2xl font-bold text-orange-700">{{ userGrowth.totalUsers }}</div>
+            <div class="text-sm text-orange-600">Total Users</div>
           </div>
         </div>
 
@@ -215,15 +186,11 @@
           <div class="flex gap-2">
             <button @click="switchLearningPathChart('bar')" 
               :class="['px-3 py-1 rounded-lg text-sm transition', learningPathChartType === 'bar' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100']">
-              Enrollment
+              Active Users
             </button>
             <button @click="switchLearningPathChart('doughnut')" 
               :class="['px-3 py-1 rounded-lg text-sm transition', learningPathChartType === 'doughnut' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100']">
-              Completion
-            </button>
-            <button @click="switchLearningPathChart('radar')" 
-              :class="['px-3 py-1 rounded-lg text-sm transition', learningPathChartType === 'radar' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100']">
-              Engagement
+              Success Rate
             </button>
           </div>
         </div>
@@ -234,106 +201,18 @@
 
         <!-- Top Learning Paths -->
         <div class="space-y-3">
-          <h4 class="text-sm font-medium text-gray-700">Top Learning Paths</h4>
-          <div v-for="path in learningPathEngagement.topPaths" :key="path.id" 
+          <h4 class="text-sm font-medium text-gray-700">Top Programming Languages</h4>
+          <div v-for="path in learningPathEngagement.topPaths" :key="path.language_name" 
                class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div class="flex-1">
-              <div class="text-sm font-medium text-gray-900">{{ path.name }}</div>
-              <div class="text-xs text-gray-500">{{ path.enrollments }} enrollments • {{ path.completionRate }}% completion</div>
+              <div class="text-sm font-medium text-gray-900">{{ path.language_name }}</div>
+              <div class="text-xs text-gray-500">{{ path.active_users }} active users • {{ path.success_rate }}% success rate</div>
             </div>
             <div class="text-right">
-              <div class="text-sm font-semibold text-gray-900">{{ path.dropOffRate }}%</div>
-              <div class="text-xs text-gray-500">Drop-off</div>
+              <div class="text-sm font-semibold text-gray-900">{{ path.total_submissions.toLocaleString() }}</div>
+              <div class="text-xs text-gray-500">submissions</div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- AI Usage Analytics -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-lg font-semibold text-gray-900">AI Usage Analytics</h3>
-          <div class="flex gap-2">
-            <button @click="switchAiChart('line')" 
-              :class="['px-3 py-1 rounded-lg text-sm transition', aiChartType === 'line' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100']">
-              Volume
-            </button>
-            <button @click="switchAiChart('bar')" 
-              :class="['px-3 py-1 rounded-lg text-sm transition', aiChartType === 'bar' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100']">
-              Topics
-            </button>
-            <button @click="switchAiChart('doughnut')" 
-              :class="['px-3 py-1 rounded-lg text-sm transition', aiChartType === 'doughnut' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100']">
-              Hours
-            </button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 mb-6">
-          <div class="text-center p-4 bg-indigo-50 rounded-lg">
-            <div class="text-2xl font-bold text-indigo-700">{{ aiUsage.totalInteractions }}</div>
-            <div class="text-sm text-indigo-600">Total Interactions</div>
-          </div>
-          <div class="text-center p-4 bg-purple-50 rounded-lg">
-            <div class="text-2xl font-bold text-purple-700">{{ aiUsage.avgUsagePerUser }}</div>
-            <div class="text-sm text-purple-600">Avg per User</div>
-          </div>
-          <div class="text-center p-4 bg-blue-50 rounded-lg">
-            <div class="text-2xl font-bold text-blue-700">{{ aiUsage.avgResponseTime }}s</div>
-            <div class="text-sm text-blue-600">Avg Response Time</div>
-          </div>
-          <div class="text-center p-4 bg-green-50 rounded-lg">
-            <div class="text-2xl font-bold text-green-700">{{ aiUsage.dailyQueries }}</div>
-            <div class="text-sm text-green-600">Daily Queries</div>
-          </div>
-        </div>
-
-        <div class="h-80">
-          <canvas ref="aiUsageChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Session & Login Analytics -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-lg font-semibold text-gray-900">Session & Login Analytics</h3>
-          <div class="flex gap-2">
-            <button @click="switchSessionChart('bar')" 
-              :class="['px-3 py-1 rounded-lg text-sm transition', sessionChartType === 'bar' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100']">
-              Hours
-            </button>
-            <button @click="switchSessionChart('line')" 
-              :class="['px-3 py-1 rounded-lg text-sm transition', sessionChartType === 'line' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100']">
-              Daily
-            </button>
-            <button @click="switchSessionChart('pie')" 
-              :class="['px-3 py-1 rounded-lg text-sm transition', sessionChartType === 'pie' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100']">
-              User Types
-            </button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 mb-6">
-          <div class="text-center p-4 bg-orange-50 rounded-lg">
-            <div class="text-2xl font-bold text-orange-700">{{ sessionAnalytics.retentionRate }}%</div>
-            <div class="text-sm text-orange-600">Retention Rate</div>
-          </div>
-          <div class="text-center p-4 bg-blue-50 rounded-lg">
-            <div class="text-2xl font-bold text-blue-700">{{ sessionAnalytics.avgSessionDuration }}</div>
-            <div class="text-sm text-blue-600">Avg Session</div>
-          </div>
-          <div class="text-center p-4 bg-green-50 rounded-lg">
-            <div class="text-2xl font-bold text-green-700">{{ sessionAnalytics.dailyLogins }}</div>
-            <div class="text-sm text-green-600">Daily Logins</div>
-          </div>
-          <div class="text-center p-4 bg-purple-50 rounded-lg">
-            <div class="text-2xl font-bold text-purple-700">{{ sessionAnalytics.returningVsNew }}%</div>
-            <div class="text-sm text-purple-600">Returning Users</div>
-          </div>
-        </div>
-
-        <div class="h-80">
-          <canvas ref="sessionChart"></canvas>
         </div>
       </div>
 
@@ -349,10 +228,6 @@
             <button @click="switchChallengeChart('line')" 
               :class="['px-3 py-1 rounded-lg text-sm transition', challengeChartType === 'line' ? 'bg-red-100 text-red-700' : 'text-gray-500 hover:bg-gray-100']">
               Attempts
-            </button>
-            <button @click="switchChallengeChart('scatter')" 
-              :class="['px-3 py-1 rounded-lg text-sm transition', challengeChartType === 'scatter' ? 'bg-red-100 text-red-700' : 'text-gray-500 hover:bg-gray-100']">
-              Difficulty
             </button>
           </div>
         </div>
@@ -381,65 +256,67 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Additional Analytics Sections -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+      <!-- Session Analytics -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold text-gray-900">Session Analytics</h3>
+          <div class="flex gap-2">
+            <button @click="switchSessionChart('bar')" 
+              :class="['px-3 py-1 rounded-lg text-sm transition', sessionChartType === 'bar' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100']">
+              Daily Activity
+            </button>
+            <button @click="switchSessionChart('line')" 
+              :class="['px-3 py-1 rounded-lg text-sm transition', sessionChartType === 'line' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100']">
+              Peak Hours
+            </button>
+          </div>
+        </div>
+
+        <div class="h-80">
+          <canvas ref="sessionChart"></canvas>
+        </div>
+      </div>
+
       <!-- Lesson Performance -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Lesson Performance</h3>
-        <div class="h-64 mb-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold text-gray-900">Recent Lessons</h3>
+          <div class="flex gap-2">
+            <button @click="switchLessonChart('bar')" 
+              :class="['px-3 py-1 rounded-lg text-sm transition', lessonChartType === 'bar' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-100']">
+              View
+            </button>
+          </div>
+        </div>
+
+        <div class="h-80 mb-6">
           <canvas ref="lessonChart"></canvas>
         </div>
-        <div class="space-y-4">
+
+        <!-- Recent Lessons -->
+        <div class="space-y-3">
+          <h4 class="text-sm font-medium text-gray-700">Recently Added Lessons</h4>
           <div v-for="lesson in lessonPerformance.topLessons" :key="lesson.id" 
                class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div class="flex-1">
               <div class="text-sm font-medium text-gray-900">{{ lesson.title }}</div>
-              <div class="text-xs text-gray-500">{{ lesson.views }} views • {{ lesson.completionRate }}% completion</div>
+              <div class="text-xs text-gray-500">{{ lesson.language_name }} • {{ formatDate(lesson.created_at) }}</div>
             </div>
             <div class="text-right">
-              <div class="text-sm font-semibold text-gray-900">{{ lesson.avgTimeSpent }}</div>
-              <div class="text-xs text-gray-500">avg time</div>
+              <div class="text-sm font-semibold text-gray-900">{{ lesson.order_index }}</div>
+              <div class="text-xs text-gray-500">order</div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Account Moderation -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Moderation</h3>
-        <div class="h-64 mb-4">
-          <canvas ref="moderationChart"></canvas>
-        </div>
-        <div class="space-y-4">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="text-center p-3 bg-red-50 rounded-lg">
-              <div class="text-lg font-bold text-red-700">{{ accountModeration.suspendedCount }}</div>
-              <div class="text-xs text-red-600">Suspended</div>
-            </div>
-            <div class="text-center p-3 bg-gray-50 rounded-lg">
-              <div class="text-lg font-bold text-gray-700">{{ accountModeration.bannedCount }}</div>
-              <div class="text-xs text-gray-600">Banned</div>
-            </div>
-          </div>
-          <div class="space-y-2">
-            <h4 class="text-sm font-medium text-gray-700">Top Moderation Reasons</h4>
-            <div v-for="reason in accountModeration.topReasons" :key="reason.reason" 
-                 class="flex justify-between text-sm">
-              <span class="text-gray-600">{{ reason.reason }}</span>
-              <span class="text-gray-500">{{ reason.count }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Leaderboard Analytics -->
+    <!-- Additional Analytics Sections -->
+    <div v-if="!loading" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+      <!-- Top Performers -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Performers</h3>
-        <div class="h-64 mb-4">
-          <canvas ref="leaderboardChart"></canvas>
-        </div>
         <div class="space-y-3">
           <div v-for="(user, index) in leaderboard.topPerformers" :key="user.id" 
                class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -448,13 +325,37 @@
                 {{ index + 1 }}
               </div>
               <div>
-                <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
-                <div class="text-xs text-gray-500">{{ user.completedLessons }} lessons</div>
+                <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
+                <div class="text-xs text-gray-500">{{ user.challenges_solved }} challenges solved</div>
               </div>
             </div>
             <div class="text-right">
-              <div class="text-sm font-semibold text-green-700">{{ user.successRate }}%</div>
-              <div class="text-xs text-gray-500">success rate</div>
+              <div class="text-sm font-semibold text-green-700">{{ user.xp }}</div>
+              <div class="text-xs text-gray-500">XP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+        <div class="space-y-3">
+          <div v-for="activity in recentActivity.activities" :key="activity.id" 
+               class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div class="flex-1">
+              <div class="text-sm font-medium text-gray-900">{{ activity.description }}</div>
+              <div class="text-xs text-gray-500">{{ formatTime(activity.time) }}</div>
+            </div>
+            <div class="text-right">
+              <span :class="['px-2 py-1 rounded text-xs font-medium', 
+                activity.type === 'submission' && activity.status === 'Passed' ? 'bg-green-100 text-green-800' :
+                activity.type === 'submission' ? 'bg-red-100 text-red-800' :
+                activity.type === 'challenge_solve' ? 'bg-blue-100 text-blue-800' :
+                'bg-gray-100 text-gray-800'
+              ]">
+                {{ activity.type.replace('_', ' ') }}
+              </span>
             </div>
           </div>
         </div>
@@ -471,11 +372,8 @@ import {
   BarController,
   PieController,
   DoughnutController,
-  RadarController,
-  ScatterController,
   CategoryScale,
   LinearScale,
-  RadialLinearScale,
   PointElement,
   LineElement,
   BarElement,
@@ -492,11 +390,8 @@ Chart.register(
   BarController,
   PieController,
   DoughnutController,
-  RadarController,
-  ScatterController,
   CategoryScale,
   LinearScale,
-  RadialLinearScale,
   PointElement,
   LineElement,
   BarElement,
@@ -511,158 +406,199 @@ Chart.register(
 const userGrowthChart = ref(null)
 const submissionChart = ref(null)
 const learningPathChart = ref(null)
-const aiUsageChart = ref(null)
 const sessionChart = ref(null)
 const challengeChart = ref(null)
 const lessonChart = ref(null)
-const moderationChart = ref(null)
-const leaderboardChart = ref(null)
 
 // Chart instances
 let userGrowthChartInstance = null
 let submissionChartInstance = null
 let learningPathChartInstance = null
-let aiUsageChartInstance = null
 let sessionChartInstance = null
 let challengeChartInstance = null
 let lessonChartInstance = null
-let moderationChartInstance = null
-let leaderboardChartInstance = null
 
 // Time range selector
 const timeRange = ref('30d')
+const loading = ref(true)
 
 // Chart type selectors
 const userGrowthChartType = ref('line')
 const submissionChartType = ref('line')
 const learningPathChartType = ref('bar')
-const aiChartType = ref('line')
 const sessionChartType = ref('bar')
 const challengeChartType = ref('bar')
+const lessonChartType = ref('bar')
 
-// Analytics data
+// Analytics data - updated to match backend structure
 const platformOverview = ref({
-  totalUsers: 15432,
-  activeSessions: 843,
-  totalSubmissions: 89234,
-  submissionSuccessRate: 78,
-  lessonsCompleted: 45678,
-  completionGrowth: 12,
-  aiInteractions: 23456,
-  avgAiResponseTime: 2.3,
-  totalEnrollments: 34567,
-  enrollmentCompletionRate: 65,
-  userGrowth: 8.2
+  totalUsers: 0,
+  activeSessions: 0,
+  totalSubmissions: 0,
+  submissionSuccessRate: 0,
+  totalLessons: 0,
+  totalChallenges: 0,
+  userGrowth: 0
 })
 
 const userGrowth = ref({
-  dailyNewUsers: 42,
-  weeklyNewUsers: 294,
-  monthlyGrowthRate: 8.2,
-  returningUsers: 1234,
-  statusDistribution: [
-    { status: 'active', count: 12000, percentage: 78 },
-    { status: 'suspended', count: 150, percentage: 1 },
-    { status: 'banned', count: 82, percentage: 0.5 },
-    { status: 'pending', count: 3200, percentage: 20.5 }
-  ],
-  timelineData: [120, 135, 148, 162, 178, 195, 210, 228, 245, 260, 275, 290]
+  dailyNewUsers: 0,
+  weeklyNewUsers: 0,
+  monthlyGrowthRate: 0,
+  totalUsers: 0,
+  timelineData: [],
+  timelineLabels: []
 })
 
 const submissionActivity = ref({
-  totalSubmissions: 89234,
-  passedSubmissions: 69602,
-  failedSubmissions: 19632,
-  successRate: 78,
-  languageUsage: [
-    { language: 'JavaScript', percentage: 45 },
-    { language: 'Python', percentage: 30 },
-    { language: 'Java', percentage: 15 },
-    { language: 'C++', percentage: 8 },
-    { language: 'Other', percentage: 2 }
-  ],
-  dailySubmissions: [234, 287, 265, 312, 298, 345, 321]
+  totalSubmissions: 0,
+  passedSubmissions: 0,
+  failedSubmissions: 0,
+  successRate: 0,
+  languageUsage: [],
+  dailySubmissions: [],
+  dailyLabels: []
 })
 
 const learningPathEngagement = ref({
-  topPaths: [
-    { id: 1, name: 'JavaScript Fundamentals', enrollments: 5432, completionRate: 72, dropOffRate: 28 },
-    { id: 2, name: 'React Development', enrollments: 4321, completionRate: 65, dropOffRate: 35 },
-    { id: 3, name: 'Python for Beginners', enrollments: 3987, completionRate: 81, dropOffRate: 19 },
-    { id: 4, name: 'Data Structures', enrollments: 2876, completionRate: 58, dropOffRate: 42 }
-  ],
-  completionRates: [72, 65, 81, 58],
-  dropOffPoints: ['Lesson 3', 'Lesson 7', 'Lesson 5', 'Lesson 9']
-})
-
-const aiUsage = ref({
-  totalInteractions: 23456,
-  avgUsagePerUser: 15.2,
-  avgResponseTime: 2.3,
-  dailyQueries: 342,
-  topTopics: [
-    { topic: 'Code Debugging', count: 5432 },
-    { topic: 'Algorithm Help', count: 4321 },
-    { topic: 'Syntax Questions', count: 3987 },
-    { topic: 'Best Practices', count: 2876 }
-  ],
-  hourlyUsage: [12, 8, 5, 3, 2, 4, 15, 45, 67, 89, 78, 65, 72, 68, 63, 58, 62, 78, 85, 73, 52, 38, 25, 18]
-})
-
-const sessionAnalytics = ref({
-  retentionRate: 72,
-  avgSessionDuration: '24m',
-  dailyLogins: 2843,
-  returningVsNew: 68,
-  peakHours: [
-    { hour: '09:00', logins: 234 },
-    { hour: '14:00', logins: 432 },
-    { hour: '19:00', logins: 387 }
-  ]
+  topPaths: []
 })
 
 const challengeDifficulty = ref({
-  avgPassRate: 65,
-  avgAttempts: 2.3,
-  mostFailed: 'Binary Search',
-  mostCompleted: 'Hello World',
-  challenges: [
-    { name: 'Two Sum', passRate: 85, attempts: 1.8 },
-    { name: 'Palindrome', passRate: 72, attempts: 2.1 },
-    { name: 'Binary Search', passRate: 45, attempts: 3.4 },
-    { name: 'Sorting', passRate: 68, attempts: 2.5 },
-    { name: 'Graph Traversal', passRate: 52, attempts: 3.1 }
-  ]
+  avgPassRate: 0,
+  avgAttempts: 0,
+  mostFailed: 'N/A',
+  mostCompleted: 'N/A',
+  challenges: []
 })
 
 const lessonPerformance = ref({
-  topLessons: [
-    { id: 1, title: 'Introduction to Variables', views: 5432, completionRate: 92, avgTimeSpent: '8m' },
-    { id: 2, title: 'Functions and Scope', views: 4321, completionRate: 78, avgTimeSpent: '15m' },
-    { id: 3, title: 'Array Methods', views: 3987, completionRate: 85, avgTimeSpent: '12m' },
-    { id: 4, title: 'Async Programming', views: 2876, completionRate: 65, avgTimeSpent: '22m' }
-  ]
+  topLessons: []
 })
 
-const accountModeration = ref({
-  suspendedCount: 42,
-  bannedCount: 23,
-  topReasons: [
-    { reason: 'Inappropriate Content', count: 15 },
-    { reason: 'Spam', count: 12 },
-    { reason: 'Multiple Accounts', count: 8 },
-    { reason: 'Code Plagiarism', count: 6 }
-  ]
+const sessionAnalytics = ref({
+  dailyActivity: [],
+  peakHours: []
 })
 
 const leaderboard = ref({
-  topPerformers: [
-    { id: 1, name: 'Alex Johnson', completedLessons: 156, successRate: 94 },
-    { id: 2, name: 'Sarah Chen', completedLessons: 142, successRate: 92 },
-    { id: 3, name: 'Mike Rodriguez', completedLessons: 138, successRate: 89 },
-    { id: 4, name: 'Emily Davis', completedLessons: 127, successRate: 91 }
-  ]
+  topPerformers: []
 })
+
+const recentActivity = ref({
+  activities: []
+})
+
+// API functions
+async function loadAllAnalytics() {
+  try {
+    loading.value = true
+    await Promise.all([
+      loadPlatformOverview(),
+      loadUserGrowth(),
+      loadSubmissionActivity(),
+      loadLearningPaths(),
+      loadChallengeDifficulty(),
+      loadLessonPerformance(),
+      loadSessionStats(),
+      loadTopPerformers(),
+      loadRecentActivity()
+    ])
+    
+    // Recreate charts with real data
+    nextTick(() => {
+      createAllCharts()
+    })
+  } catch (error) {
+    console.error('Failed to load analytics:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+async function loadPlatformOverview() {
+  const response = await fetch('/api/admin/analytics/overview')
+  const data = await response.json()
+  platformOverview.value = data
+}
+
+async function loadUserGrowth() {
+  const response = await fetch(`/api/admin/analytics/user-growth?range=${timeRange.value}`)
+  const data = await response.json()
+  
+  if (data.length > 0) {
+    userGrowth.value.timelineData = data.map(item => item.new_users)
+    userGrowth.value.timelineLabels = data.map(item => item.period)
+    userGrowth.value.dailyNewUsers = data[data.length - 1]?.new_users || 0
+    userGrowth.value.weeklyNewUsers = data.slice(-7).reduce((sum, item) => sum + item.new_users, 0)
+    userGrowth.value.totalUsers = data.reduce((sum, item) => sum + item.new_users, 0)
+    userGrowth.value.monthlyGrowthRate = platformOverview.value.userGrowth
+  }
+}
+
+async function loadSubmissionActivity() {
+  const response = await fetch(`/api/admin/analytics/submission-activity?range=${timeRange.value}`)
+  const data = await response.json()
+  
+  submissionActivity.value.dailyStats = data.dailyStats
+  submissionActivity.value.languageUsage = data.languageUsage
+  
+  if (data.dailyStats.length > 0) {
+    const latest = data.dailyStats[data.dailyStats.length - 1]
+    submissionActivity.value.totalSubmissions = latest.total_submissions
+    submissionActivity.value.passedSubmissions = latest.passed_submissions
+    submissionActivity.value.failedSubmissions = latest.failed_submissions
+    submissionActivity.value.successRate = (latest.passed_submissions / latest.total_submissions * 100).toFixed(1)
+    submissionActivity.value.dailySubmissions = data.dailyStats.map(item => item.total_submissions)
+    submissionActivity.value.dailyLabels = data.dailyStats.map(item => item.period)
+  }
+}
+
+async function loadLearningPaths() {
+  const response = await fetch('/api/admin/analytics/learning-paths')
+  const data = await response.json()
+  learningPathEngagement.value.topPaths = data
+}
+
+async function loadChallengeDifficulty() {
+  const response = await fetch('/api/admin/analytics/challenge-difficulty')
+  const data = await response.json()
+  
+  challengeDifficulty.value.challenges = data.challenges
+  challengeDifficulty.value.avgPassRate = data.overall.avg_pass_rate
+  challengeDifficulty.value.avgAttempts = data.overall.avg_attempts
+  
+  // Find most failed and most completed
+  if (data.challenges.length > 0) {
+    const sortedByPassRate = [...data.challenges].sort((a, b) => a.pass_rate - b.pass_rate)
+    challengeDifficulty.value.mostFailed = sortedByPassRate[0]?.title || 'N/A'
+    challengeDifficulty.value.mostCompleted = sortedByPassRate[sortedByPassRate.length - 1]?.title || 'N/A'
+  }
+}
+
+async function loadLessonPerformance() {
+  const response = await fetch('/api/admin/analytics/lesson-performance')
+  const data = await response.json()
+  lessonPerformance.value.topLessons = data
+}
+
+async function loadSessionStats() {
+  const response = await fetch('/api/admin/analytics/session-stats')
+  const data = await response.json()
+  sessionAnalytics.value = data
+}
+
+async function loadTopPerformers() {
+  const response = await fetch('/api/admin/analytics/top-performers?limit=5')
+  const data = await response.json()
+  leaderboard.value.topPerformers = data
+}
+
+async function loadRecentActivity() {
+  const response = await fetch('/api/admin/analytics/recent-activity?limit=5')
+  const data = await response.json()
+  recentActivity.value.activities = data
+}
 
 // Chart switching functions
 function switchUserGrowthChart(type) {
@@ -686,13 +622,6 @@ function switchLearningPathChart(type) {
   })
 }
 
-function switchAiChart(type) {
-  aiChartType.value = type
-  nextTick(() => {
-    createAiUsageChart()
-  })
-}
-
 function switchSessionChart(type) {
   sessionChartType.value = type
   nextTick(() => {
@@ -707,7 +636,14 @@ function switchChallengeChart(type) {
   })
 }
 
-// Chart creation functions
+function switchLessonChart(type) {
+  lessonChartType.value = type
+  nextTick(() => {
+    createLessonChart()
+  })
+}
+
+// Chart creation functions using real data
 function createUserGrowthChart() {
   if (userGrowthChartInstance) {
     userGrowthChartInstance.destroy()
@@ -719,7 +655,7 @@ function createUserGrowthChart() {
     userGrowthChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        labels: userGrowth.value.timelineLabels,
         datasets: [{
           label: 'New Users',
           data: userGrowth.value.timelineData,
@@ -736,35 +672,18 @@ function createUserGrowthChart() {
         plugins: {
           legend: {
             display: false
-          },
-          title: {
-            display: true,
-            text: 'Monthly User Growth'
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.1)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
           }
         }
       }
     })
-  } else if (userGrowthChartType.value === 'bar') {
+  } else {
     userGrowthChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        labels: userGrowth.value.timelineLabels.slice(-6),
         datasets: [{
           label: 'New Users',
-          data: [320, 450, 380, 520, 480, 610],
+          data: userGrowth.value.timelineData.slice(-6),
           backgroundColor: '#3b82f6',
           borderColor: '#2563eb',
           borderWidth: 1
@@ -776,38 +695,6 @@ function createUserGrowthChart() {
         plugins: {
           legend: {
             display: false
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    })
-  } else {
-    userGrowthChartInstance = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: userGrowth.value.statusDistribution.map(s => s.status),
-        datasets: [{
-          data: userGrowth.value.statusDistribution.map(s => s.count),
-          backgroundColor: [
-            '#10b981',
-            '#f59e0b',
-            '#ef4444',
-            '#6b7280'
-          ],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom'
           }
         }
       }
@@ -826,7 +713,7 @@ function createSubmissionChart() {
     submissionChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: submissionActivity.value.dailyLabels,
         datasets: [{
           label: 'Submissions',
           data: submissionActivity.value.dailySubmissions,
@@ -906,16 +793,16 @@ function createLearningPathChart() {
   }
 
   const ctx = learningPathChart.value.getContext('2d')
-  const pathNames = learningPathEngagement.value.topPaths.map(p => p.name)
+  const paths = learningPathEngagement.value.topPaths.slice(0, 5)
   
   if (learningPathChartType.value === 'bar') {
     learningPathChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: pathNames,
+        labels: paths.map(p => p.language_name),
         datasets: [{
-          label: 'Enrollments',
-          data: learningPathEngagement.value.topPaths.map(p => p.enrollments),
+          label: 'Active Users',
+          data: paths.map(p => p.active_users),
           backgroundColor: '#10b981',
           borderColor: '#059669',
           borderWidth: 1
@@ -932,214 +819,20 @@ function createLearningPathChart() {
         }
       }
     })
-  } else if (learningPathChartType.value === 'doughnut') {
+  } else {
     learningPathChartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: pathNames,
+        labels: paths.map(p => p.language_name),
         datasets: [{
-          data: learningPathEngagement.value.topPaths.map(p => p.completionRate),
+          data: paths.map(p => p.success_rate),
           backgroundColor: [
             '#3b82f6',
             '#10b981',
             '#f59e0b',
-            '#ef4444'
+            '#ef4444',
+            '#8b5cf6'
           ],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }
-    })
-  } else {
-    learningPathChartInstance = new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: ['Enrollment', 'Completion', 'Engagement', 'Retention', 'Satisfaction'],
-        datasets: [{
-          label: 'JavaScript Fundamentals',
-          data: [85, 72, 78, 65, 80],
-          backgroundColor: 'rgba(59, 130, 246, 0.2)',
-          borderColor: '#3b82f6',
-          borderWidth: 2
-        }, {
-          label: 'React Development',
-          data: [78, 65, 72, 58, 70],
-          backgroundColor: 'rgba(16, 185, 129, 0.2)',
-          borderColor: '#10b981',
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          r: {
-            beginAtZero: true,
-            max: 100
-          }
-        }
-      }
-    })
-  }
-}
-
-function createAiUsageChart() {
-  if (aiUsageChartInstance) {
-    aiUsageChartInstance.destroy()
-  }
-
-  const ctx = aiUsageChart.value.getContext('2d')
-  
-  if (aiChartType.value === 'line') {
-    aiUsageChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'AI Interactions',
-          data: [342, 398, 421, 387, 456, 312, 289],
-          borderColor: '#6366f1',
-          backgroundColor: 'rgba(99, 102, 241, 0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    })
-  } else if (aiChartType.value === 'bar') {
-    aiUsageChartInstance = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: aiUsage.value.topTopics.map(t => t.topic),
-        datasets: [{
-          label: 'Requests',
-          data: aiUsage.value.topTopics.map(t => t.count),
-          backgroundColor: '#6366f1',
-          borderColor: '#4f46e5',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    })
-  } else {
-    aiUsageChartInstance = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Morning (6-12)', 'Afternoon (12-18)', 'Evening (18-24)', 'Night (0-6)'],
-        datasets: [{
-          data: [35, 40, 20, 5],
-          backgroundColor: [
-            '#3b82f6',
-            '#10b981',
-            '#f59e0b',
-            '#6b7280'
-          ],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }
-    })
-  }
-}
-
-function createSessionChart() {
-  if (sessionChartInstance) {
-    sessionChartInstance.destroy()
-  }
-
-  const ctx = sessionChart.value.getContext('2d')
-  
-  if (sessionChartType.value === 'bar') {
-    sessionChartInstance = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['6AM', '9AM', '12PM', '3PM', '6PM', '9PM', '12AM'],
-        datasets: [{
-          label: 'Logins',
-          data: [45, 234, 187, 156, 387, 298, 67],
-          backgroundColor: '#f59e0b',
-          borderColor: '#d97706',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    })
-  } else if (sessionChartType.value === 'line') {
-    sessionChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Daily Logins',
-          data: [2843, 2987, 3124, 2876, 3245, 2987, 2765],
-          borderColor: '#f59e0b',
-          backgroundColor: 'rgba(245, 158, 11, 0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    })
-  } else {
-    sessionChartInstance = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: ['Returning Users', 'New Users'],
-        datasets: [{
-          data: [68, 32],
-          backgroundColor: ['#3b82f6', '#10b981'],
           borderWidth: 2,
           borderColor: '#fff'
         }]
@@ -1163,15 +856,16 @@ function createChallengeChart() {
   }
 
   const ctx = challengeChart.value.getContext('2d')
+  const challenges = challengeDifficulty.value.challenges.slice(0, 5)
   
   if (challengeChartType.value === 'bar') {
     challengeChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: challengeDifficulty.value.challenges.map(c => c.name),
+        labels: challenges.map(c => c.title),
         datasets: [{
           label: 'Pass Rate (%)',
-          data: challengeDifficulty.value.challenges.map(c => c.passRate),
+          data: challenges.map(c => c.pass_rate),
           backgroundColor: '#ef4444',
           borderColor: '#dc2626',
           borderWidth: 1
@@ -1193,14 +887,14 @@ function createChallengeChart() {
         }
       }
     })
-  } else if (challengeChartType.value === 'line') {
+  } else {
     challengeChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: challengeDifficulty.value.challenges.map(c => c.name),
+        labels: challenges.map(c => c.title),
         datasets: [{
           label: 'Avg Attempts',
-          data: challengeDifficulty.value.challenges.map(c => c.attempts),
+          data: challenges.map(c => c.total_attempts),
           borderColor: '#ef4444',
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
           borderWidth: 2,
@@ -1218,39 +912,62 @@ function createChallengeChart() {
         }
       }
     })
-  } else {
-    challengeChartInstance = new Chart(ctx, {
-      type: 'scatter',
+  }
+}
+
+function createSessionChart() {
+  if (sessionChartInstance) {
+    sessionChartInstance.destroy()
+  }
+
+  const ctx = sessionChart.value.getContext('2d')
+  
+  if (sessionChartType.value === 'bar') {
+    const dailyData = sessionAnalytics.value.dailyActivity.slice(-7)
+    sessionChartInstance = new Chart(ctx, {
+      type: 'bar',
       data: {
+        labels: dailyData.map(d => d.date),
         datasets: [{
-          label: 'Challenges',
-          data: challengeDifficulty.value.challenges.map(c => ({
-            x: c.attempts,
-            y: c.passRate
-          })),
-          backgroundColor: '#ef4444',
-          borderColor: '#dc2626',
-          borderWidth: 1,
-          pointRadius: 8
+          label: 'Unique Users',
+          data: dailyData.map(d => d.unique_users),
+          backgroundColor: '#f59e0b',
+          borderColor: '#d97706',
+          borderWidth: 1
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Average Attempts'
-            }
-          },
-          y: {
-            title: {
-              display: true,
-              text: 'Pass Rate (%)'
-            },
-            beginAtZero: true,
-            max: 100
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    })
+  } else {
+    const peakData = sessionAnalytics.value.peakHours
+    sessionChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: peakData.map(p => `${p.hour}:00`),
+        datasets: [{
+          label: 'Submissions',
+          data: peakData.map(p => p.submissions),
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
           }
         }
       }
@@ -1264,13 +981,15 @@ function createLessonChart() {
   }
 
   const ctx = lessonChart.value.getContext('2d')
+  const lessons = lessonPerformance.value.topLessons
+  
   lessonChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: lessonPerformance.value.topLessons.map(l => l.title.split(' ').slice(0, 2).join(' ')),
+      labels: lessons.map(l => l.title.split(' ').slice(0, 2).join(' ')),
       datasets: [{
-        label: 'Completion Rate (%)',
-        data: lessonPerformance.value.topLessons.map(l => l.completionRate),
+        label: 'Order Index',
+        data: lessons.map(l => l.order_index),
         backgroundColor: '#3b82f6',
         borderColor: '#2563eb',
         borderWidth: 1
@@ -1283,123 +1002,37 @@ function createLessonChart() {
         legend: {
           display: false
         }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100
-        }
       }
     }
   })
 }
 
-function createModerationChart() {
-  if (moderationChartInstance) {
-    moderationChartInstance.destroy()
-  }
-
-  const ctx = moderationChart.value.getContext('2d')
-  moderationChartInstance = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: accountModeration.value.topReasons.map(r => r.reason),
-      datasets: [{
-        data: accountModeration.value.topReasons.map(r => r.count),
-        backgroundColor: [
-          '#ef4444',
-          '#f59e0b',
-          '#3b82f6',
-          '#10b981'
-        ],
-        borderWidth: 2,
-        borderColor: '#fff'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom'
-        }
-      }
-    }
-  })
+// Utility functions
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleDateString()
 }
 
-function createLeaderboardChart() {
-  if (leaderboardChartInstance) {
-    leaderboardChartInstance.destroy()
-  }
-
-  const ctx = leaderboardChart.value.getContext('2d')
-  leaderboardChartInstance = new Chart(ctx, {
-    type: 'radar',
-    data: {
-      labels: ['Lessons Completed', 'Success Rate', 'Consistency', 'Speed', 'Helpfulness'],
-      datasets: [{
-        label: 'Top Performer',
-        data: [95, 94, 90, 85, 88],
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-        borderColor: '#3b82f6',
-        borderWidth: 2
-      }, {
-        label: 'Average User',
-        data: [65, 72, 68, 60, 55],
-        backgroundColor: 'rgba(16, 185, 129, 0.2)',
-        borderColor: '#10b981',
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        r: {
-          beginAtZero: true,
-          max: 100
-        }
-      }
-    }
-  })
-}
-
-// API functions
-async function loadAllAnalytics() {
-  try {
-    console.log('Loading analytics for time range:', timeRange.value)
-    await new Promise(resolve => setTimeout(resolve, 500))
-    // Recreate charts with new data
-    createAllCharts()
-  } catch (error) {
-    console.error('Failed to load analytics:', error)
-  }
+function formatTime(dateString) {
+  return new Date(dateString).toLocaleTimeString()
 }
 
 function createAllCharts() {
   createUserGrowthChart()
   createSubmissionChart()
   createLearningPathChart()
-  createAiUsageChart()
-  createSessionChart()
   createChallengeChart()
+  createSessionChart()
   createLessonChart()
-  createModerationChart()
-  createLeaderboardChart()
 }
 
 function exportReport() {
-  // In a real app, this would generate and download a PDF/Excel report
   console.log('Exporting analytics report...')
   alert('Export functionality would generate a comprehensive report here!')
 }
 
 // Lifecycle
 onMounted(() => {
-  nextTick(() => {
-    createAllCharts()
-  })
+  loadAllAnalytics()
 })
 
 onUnmounted(() => {
@@ -1408,12 +1041,9 @@ onUnmounted(() => {
     userGrowthChartInstance,
     submissionChartInstance,
     learningPathChartInstance,
-    aiUsageChartInstance,
     sessionChartInstance,
     challengeChartInstance,
-    lessonChartInstance,
-    moderationChartInstance,
-    leaderboardChartInstance
+    lessonChartInstance
   ]
   
   charts.forEach(chart => {
