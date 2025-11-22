@@ -1,3 +1,4 @@
+// src/core/composables/useApi.js
 import { ref } from 'vue'
 import { axiosInstance } from '../http/axios'
 import { authAPI, adminAPI, learnAPI } from '../api'
@@ -51,7 +52,7 @@ export const useApi = () => {
       }
     },
     
-    tutorials: {
+    learn: {
       // Languages
       languages: {
         getAll: () => execute(learnAPI.languages.getAll),
@@ -70,13 +71,13 @@ export const useApi = () => {
         delete: (id) => execute(learnAPI.lessons.delete, id),
       },
       
-      // Tutorials
-      getAll: (params) => execute(learnAPI.tutorials.getAll, params),
-      get: (id) => execute(learnAPI.tutorials.get, id),
-      create: (data) => execute(learnAPI.tutorials.create, data),
-      update: (id, data) => execute(learnAPI.tutorials.update, id, data),
-      delete: (id) => execute(learnAPI.tutorials.delete, id),
-      search: (query) => execute(learnAPI.tutorials.search, query),
+      // learn
+      getAll: (params) => execute(learnAPI.learn.getAll, params),
+      get: (id) => execute(learnAPI.learn.get, id),
+      create: (data) => execute(learnAPI.learn.create, data),
+      update: (id, data) => execute(learnAPI.learn.update, id, data),
+      delete: (id) => execute(learnAPI.learn.delete, id),
+      search: (query) => execute(learnAPI.learn.search, query),
     }
   }
 }

@@ -35,8 +35,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useChallenges } from '@/core/composables/useChallenges'
 
 import ProblemHeader from '../components/ProblemHeader.vue'
 import ProblemMeta from '../components/ProblemMeta.vue'
@@ -46,57 +47,68 @@ import TestCasesPanel from '../components/TestCasesPanel.vue'
 import SubmissionsList from '../components/SubmissionsList.vue'
 import HintsPanel from '../components/HintsPanel.vue'
 
-// route param (id/slug)
+// route param (auto-detect id or slug)
 const route = useRoute()
-const slug = route.params.slug || route.params.id || 'reverse-linked-list'
+const value = route.params.slug || route.params.id
 
-// mock loader (replace with API/composable)
+// reactive state
 const problem = reactive({
-  id: 1,
-  slug,
-  title: 'Reverse Linked List',
-  difficulty: 'easy',
-  solved: true,
-  tags: ['linked-list', 'two-pointers'],
+  id: null,
+  slug: '',
+  title: '',
+  difficulty: '',
+  solved: false,
+  tags: [],
   meta: {
-    xp: 50,
+    xp: 0,
     timeLimit: '1s',
     memoryLimit: '64MB',
-    submissions: 124,
-    accepted: 98,
+    submissions: 0,
+    accepted: 0,
   },
-  body: `Given the head of a singly linked list, reverse the list, and return the reversed list.`,
-  examples: [
-    { input: 'head = [1,2,3,4,5]', output: '[5,4,3,2,1]', explanation: 'Reverse list' },
-    { input: 'head = [1,2]', output: '[2,1]', explanation: '' },
-  ],
-  hints: [
-    'Iteratively reverse pointers with three variables: prev, curr, next.',
-    'You can also solve recursively but watch stack depth.',
-  ],
-  testcases: [
-    { id: 1, name: 'Example 1', input: '[1,2,3,4,5]', expected: '[5,4,3,2,1]' },
-    { id: 2, name: 'Empty list', input: '[]', expected: '[]' },
-    { id: 3, name: 'Single node', input: '[1]', expected: '[1]' },
-  ],
+  body: '',
+  examples: [],
+  hints: [],
+  testcases: [],
 })
 
-// editor state
 const availableLangs = ['javascript', 'python', 'cpp']
 const language = ref('javascript')
 const code = ref(`// write your ${language.value} solution here`)
-
-// fake runtime/test runner
 const testResults = ref([])
+const submissions = ref([])
 
-const submissions = ref([
-  { id: 523, lang: 'javascript', status: 'Accepted', time: '50ms', date: '2025-11-16' },
-  { id: 512, lang: 'python', status: 'Wrong Answer', time: '\u2014', date: '2025-11-10' },
-])
+const { fetchChallenge } = useChallenges()
+
+onMounted(async () => {
+  const res = await fetchChallenge(value)
+  if (!res) return
+
+  Object.assign(problem, {
+    id: res.id,
+    slug: res.slug,
+    title: res.title,
+    difficulty: res.difficulty,
+    solved: res.solved,
+    tags: res.tags,
+    meta: {
+      xp: res.xp_reward,
+      timeLimit: res.time_limit,
+      memoryLimit: res.memory_limit,
+      submissions: res.total_submissions,
+      accepted: res.accepted_submissions,
+    },
+    body: res.description,
+    examples: res.examples,
+    hints: res.hints,
+    testcases: res.testcases
+  })
+
+  submissions.value = res.submissions
+})
 
 // simulate run & submit
 function runAndSubmit({ action = 'run' } = {}) {
-  // simplistic runner: just mark tests passed for "accepted"
   testResults.value = problem.testcases.map((t) => ({
     id: t.id,
     name: t.name,
@@ -104,7 +116,6 @@ function runAndSubmit({ action = 'run' } = {}) {
     details: '',
   }))
 
-  // simulate async run
   setTimeout(() => {
     testResults.value = problem.testcases.map((t) => ({
       id: t.id,
@@ -126,9 +137,3 @@ function runAndSubmit({ action = 'run' } = {}) {
 }
 </script>
 
-<style scoped>
-/* subtle borders using theme vars */
-:root {
-  --card-border: var(--gry-200);
-}
-</style>

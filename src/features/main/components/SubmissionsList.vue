@@ -1,3 +1,4 @@
+<!-- /src/feaures/main/components/SubmmisionsList.vue -->
 <template>
   <div class="bg-white p-4 rounded-xl border border-[var(--gry-200)] shadow-sm">
     <h3 class="text-sm font-semibold text-[var(--gry-900)] mb-3">Recent Submissions</h3>
@@ -21,11 +22,14 @@
 </template>
 
 <script setup>
-const props = defineProps({ submissions: Array })
+const props = defineProps({ submissions: Object })
 
 function statusClass(status) {
-  if (status.toLowerCase().includes('accept')) return 'text-[var(--acc-grn-600)]'
-  if (status.toLowerCase().includes('wrong')) return 'text-[var(--acc-red-600)]'
+  if (!status) return 'text-[var(--gry-700)]' // fallback for undefined/null
+  const lower = status.toLowerCase()
+  if (lower.includes('accept')) return 'text-[var(--acc-grn-600)]'
+  if (lower.includes('wrong')) return 'text-[var(--acc-red-600)]'
   return 'text-[var(--gry-700)]'
 }
+
 </script>

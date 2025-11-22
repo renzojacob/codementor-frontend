@@ -45,7 +45,7 @@ import { defineProps, computed } from 'vue'
 const props = defineProps({
   item: Object,
 })
-
+console.log(props.item.difficulty)
 const difficultyClass = computed(() => {
   switch (props.item.difficulty) {
     case "easy":

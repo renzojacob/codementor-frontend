@@ -70,24 +70,11 @@
 </template>
 
 <script setup>
+import { useProfile } from '../composables/useProfile' // Use the new composable
 import UserAvatar from '../components/UserAvatar.vue'
 import UserStatBox from '../components/UserStatBox.vue'
 
-const user = {
-  name: 'John Doe',
-  username: 'johnnydev',
-  avatar: 'https://i.pravatar.cc/150?img=6',
-  level: 12,
-  xp: 3450,
-  streak: 7,
-  bio: 'Full-stack developer exploring algorithms and problem-solving daily.'
-}
-
-const recent = [
-  { title: 'Solved "Two Sum"', type: 'solved', date: '2 hours ago' },
-  { title: 'Completed challenge "Array Mastery"', type: 'completed', date: '1 day ago' },
-  { title: 'Attempted "Binary Tree Path Sum"', type: 'attempted', date: '2 days ago' }
-]
+const { user, isLoading, error } = useProfile()
 </script>
 
 <!-- Possible additions:
