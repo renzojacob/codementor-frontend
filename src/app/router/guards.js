@@ -9,6 +9,12 @@ export function setupGuards(router) {
     const requiresAuth = to.meta.requiresAuth
     const guestOnly = to.meta.guestOnly
 
+    const routeExists = router.hasRoute(to.name || '');
+
+    const title = to.meta.title 
+    ? `${to.meta.title} | CodeMentor` 
+    : 'Spehere | CodeMentor';
+
     // 1️⃣ If route requires login but user is not authenticated
     if (requiresAuth && !isAuthenticated) {
       return next({ name: 'Login' })
@@ -18,7 +24,13 @@ export function setupGuards(router) {
     if (guestOnly && isAuthenticated) {
       return next({ name: 'Dashboard' }) // or wherever you want logged users to go
     }
-    // Redirect to not found page
+
+    document.title = title;
+
+
+    if (!routeExists) {
+      next({ name: 'NotFound' }); // or { path: '/404' }
+    } 
 
     // 3️⃣ Otherwise, proceed normally
     next()

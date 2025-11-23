@@ -3,13 +3,48 @@ export default [
     path: '/app',
     component: () => import('@/app/layouts/MainLayout.vue'),
     children: [
-      { path: '', name: 'dashboard', component: () => import('./pages/Dashboard.vue') },
-      { path: 'challenges', name: 'challenges', component: () => import('./pages/Challenges.vue') },
-      { path: 'challenges/:slug', name: 'challenge-detail', component: () => import('./pages/ChallengeDetail.vue') },
-      { path: 'leaderboard', name: 'leaderboard', component: () => import('./pages/Leaderboard.vue') },
-      { path: 'profile', name: 'profile', component: () => import('./pages/Profile.vue') },
-      { path: 'settings', name: 'settings', component: () => import('./pages/Settings.vue') },
-      { path: 'achievements', name: 'achievements', component: () => import('./pages/Achievements.vue') },
+      { 
+        path: '', 
+        name: 'dashboard', 
+        component: () => import('./pages/Dashboard.vue'),
+        meta: { title: 'Dashboard' }
+      },
+      { 
+        path: 'challenges', 
+        name: 'challenges', 
+        component: () => import('./pages/Challenges.vue'),
+        meta: { title: 'Coding Challenges' }
+      },
+      { 
+        path: 'challenges/:slug', 
+        name: 'challenge-detail', 
+        component: () => import('./pages/ChallengeDetail.vue')
+        // \u26a0\ufe0f No meta.title \u2014 set in component (slug-dependent)
+      },
+      { 
+        path: 'leaderboard', 
+        name: 'leaderboard', 
+        component: () => import('./pages/Leaderboard.vue'),
+        meta: { title: 'Leaderboard' }
+      },
+      { 
+        path: 'profile', 
+        name: 'profile', 
+        component: () => import('./pages/Profile.vue'),
+        meta: { title: 'My Profile' }
+      },
+      { 
+        path: 'settings', 
+        name: 'settings', 
+        component: () => import('./pages/Settings.vue'),
+        meta: { title: 'Account Settings' }
+      },
+      { 
+        path: 'achievements', 
+        name: 'achievements', 
+        component: () => import('./pages/Achievements.vue'),
+        meta: { title: 'Achievements' }
+      },
       {
         path: 'learn',
         children: [
@@ -17,6 +52,7 @@ export default [
             path: '',
             name: 'MainLearnHome',
             component: () => import('@/features/learn/pages/LearnHome.vue'),
+            meta: { title: 'Learn to Code' }
           },
           {
             path: ':lang',
@@ -24,17 +60,19 @@ export default [
             children: [
               {
                 path: '',
-                redirect: (to) => `/learn/${to.params.lang}/intro`, // Default redirect
+                redirect: (to) => `/app/learn/${to.params.lang}/intro`, // \u2705 Fixed: was missing leading `/`
               },
               {
                 path: 'try',
                 name: 'MainTryItEditor',
                 component: () => import('@/features/learn/pages/TryItEditor.vue'),
+                meta: { title: 'Try It Yourself' }
               },
               {
                 path: ':topic',
                 name: 'MainLearnDynamic',
-                component: () => import('@/features/learn/pages/LearnDynamic.vue'),
+                component: () => import('@/features/learn/pages/LearnDynamic.vue')
+                // \u26a0\ufe0f No meta.title \u2014 handled in-component
               },
             ],
           },
@@ -42,4 +80,4 @@ export default [
       },
     ]
   }
-]
+];

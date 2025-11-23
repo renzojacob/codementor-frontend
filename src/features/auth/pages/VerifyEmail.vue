@@ -39,7 +39,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useApi } from '@/consumables'
+import { useApi } from '@/core/composables/useApi'
 
 const route = useRoute()
 const router = useRouter()

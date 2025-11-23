@@ -9,12 +9,20 @@ export default [
         path: '',
         name: 'Home',
         component: () => import('./pages/Home.vue'),
+        meta: {title: "Home"}
       },
       {
         path: 'about',
         name: 'About',
         component: () => import('./pages/About.vue'),
+        meta: {title: "About"}
       },
     ],
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('./pages/NotFound.vue'), // your 404 page
+    meta: {title: "Not Found"}
   },
 ]

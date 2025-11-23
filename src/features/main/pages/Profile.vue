@@ -70,11 +70,8 @@
 </template>
 
 <script setup>
-import { useProfile } from '../composables/useProfile' // Use the new composable
 import UserAvatar from '../components/UserAvatar.vue'
 import UserStatBox from '../components/UserStatBox.vue'
-
-const { user, isLoading, error } = useProfile()
 </script>
 
 <!-- Possible additions:
