@@ -12,35 +12,30 @@ export default [
       },
       {
         path: 'users',
-        name: 'Users',
+        name: 'UsersManagement',
         component: () => import('./pages/Users.vue'),
-      },
-      {
-        path: 'content',
-        name: 'Content',
-        component: () => import('./pages/Content.vue'),
       },
       {
         path: 'analytics',
         name: 'Analytics',
         component: () => import('./pages/Analytics.vue'),
       },
-        {
+      {
         path: 'learn',
-        name: 'Learn',
+        name: 'LearnManagement',
         component: () => import('./pages/Learn.vue'),
       },
-        {
+      {
         path: 'ai-agent',
         name: 'AI-agent',
         component: () => import('./pages/AI-agent.vue'),
       },
-        {
-        path: 'challenge',
-        name: 'Challenge',
-        component: () => import('./pages/Challenge.vue'),
+      {
+        path: 'challenges',
+        name: 'ChallengesManagement',
+        component: () => import('./pages/Challenges.vue'),
       },
-        {
+      {
         path: 'settings',
         name: 'Settings',
         component: () => import('./pages/Settings.vue'),
