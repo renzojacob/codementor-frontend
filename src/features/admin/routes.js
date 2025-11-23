@@ -28,20 +28,20 @@ export default [
         {
         path: 'learn',
         name: 'Learn',
-        component: () => import('./pages/learn.vue'),
+        component: () => import('./pages/Learn.vue'),
       },
         {
-        path: 'AI-agent',
+        path: 'ai-agent',
         name: 'AI-agent',
         component: () => import('./pages/AI-agent.vue'),
       },
         {
         path: 'challenge',
         name: 'Challenge',
-        component: () => import('./pages/challenge.vue'),
+        component: () => import('./pages/Challenge.vue'),
       },
         {
-        path: 'Settings',
+        path: 'settings',
         name: 'Settings',
         component: () => import('./pages/Settings.vue'),
       },

@@ -1,17 +1,21 @@
 // src/core/composables/useApi.js
 import { ref } from 'vue'
 import { axiosInstance } from '../http/axios'
-import { authAPI, adminAPI, learnAPI } from '../api'
+// Note: learnAPI is still imported, but we'll remove its specific handlers below.
+import { authAPI, adminAPI, learnAPI } from '../api' 
 
 export const useApi = () => {
   const loading = ref(false)
   const error = ref(null)
 
+  // This core function is what useApi provides: 
+  // centralized error handling, loading state, and execution logic.
   const execute = async (apiCall, ...args) => {
     loading.value = true
     error.value = null
     
     try {
+      // apiCall is expected to be a function that returns a Promise (like an axios call)
       const response = await apiCall(...args)
       return response.data
     } catch (err) {
@@ -30,13 +34,14 @@ export const useApi = () => {
     // Core method
     execute,
     
-    // Convenience methods
+    // Convenience methods (The original axios methods wrapped with execute)
+    // These are still useful for ad-hoc API calls not covered by specific API groups.
     get: (url, config) => execute(axiosInstance.get, url, config),
     post: (url, data, config) => execute(axiosInstance.post, url, data, config),
     put: (url, data, config) => execute(axiosInstance.put, url, data, config),
     delete: (url, config) => execute(axiosInstance.delete, url, config),
     
-    // API groups
+    // API groups (Only include groups that need useApi's logic, like auth/admin)
     auth: {
       login: (username, password) => execute(authAPI.login, username, password),
       logout: () => execute(authAPI.logout),
@@ -52,32 +57,6 @@ export const useApi = () => {
       }
     },
     
-    learn: {
-      // Languages
-      languages: {
-        getAll: () => execute(learnAPI.languages.getAll),
-        get: (id) => execute(learnAPI.languages.get, id),
-        create: (data) => execute(learnAPI.languages.create, data),
-        update: (id, data) => execute(learnAPI.languages.update, id, data),
-        delete: (id) => execute(learnAPI.languages.delete, id),
-      },
-      
-      // Lessons
-      lessons: {
-        getByLanguage: (langSlug) => execute(learnAPI.lessons.getByLanguage, langSlug),
-        get: (id) => execute(learnAPI.lessons.get, id),
-        create: (data) => execute(learnAPI.lessons.create, data),
-        update: (id, data) => execute(learnAPI.lessons.update, id, data),
-        delete: (id) => execute(learnAPI.lessons.delete, id),
-      },
-      
-      // learn
-      getAll: (params) => execute(learnAPI.learn.getAll, params),
-      get: (id) => execute(learnAPI.learn.get, id),
-      create: (data) => execute(learnAPI.learn.create, data),
-      update: (id, data) => execute(learnAPI.learn.update, id, data),
-      delete: (id) => execute(learnAPI.learn.delete, id),
-      search: (query) => execute(learnAPI.learn.search, query),
-    }
+    // *** REMOVED THE ENTIRE `learn` BLOCK HERE ***
   }
 }
