@@ -4,7 +4,7 @@ import { setupInterceptors } from './interceptors'
 
 // Create axios instance with base configuration
 export const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://codementor-backend-izws.onrender.com',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://8f7ca0bd-2f2c-4e19-b9a7-dc1905151a70-00-2yqsv7qo87qti.pike.replit.dev:8080',
   //withCredentials: true, // ← critical for cookies
   timeout: 10000,
   headers: {

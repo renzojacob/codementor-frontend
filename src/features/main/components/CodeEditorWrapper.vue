@@ -9,9 +9,16 @@
         </select>
       </div>
 
+      <!-- In CodeEditorWrapper.vue template - buttons section -->
       <div class="flex items-center gap-2">
-        <button @click="emitRun" class="px-3 py-1 rounded-md bg-[var(--pri-500)] text-white hover:bg-[var(--pri-600)] text-sm">Run</button>
-        <button @click="emitSubmit" class="px-3 py-1 rounded-md bg-[var(--acc-ind-600)] text-white hover:bg-[var(--acc-ind-500)] text-sm">Submit</button>
+        <button @click="emitRun"
+          class="px-3 py-1 rounded-md bg-[var(--pri-500)] text-white hover:bg-[var(--pri-600)] text-sm">
+          Run
+        </button>
+        <button @click="emitSubmit"
+          class="px-3 py-1 rounded-md bg-[var(--acc-ind-600)] text-white hover:bg-[var(--acc-ind-500)] text-sm">
+          Submit
+        </button>
       </div>
     </div>
 
@@ -90,10 +97,10 @@ function getExtensions(langSlug) {
 function initializeEditor(code, lang) {
   if (view) {
     // Destroy existing view before creating a new one (important for language switching)
-    view.destroy(); 
+    view.destroy();
     view = null;
   }
-  
+
   const initialState = EditorState.create({
     doc: code,
     extensions: getExtensions(lang),
@@ -123,10 +130,10 @@ onUnmounted(() => {
 watch(() => props.modelValue, (newValue) => {
   if (view && newValue !== view.state.doc.toString()) {
     view.dispatch({
-      changes: { 
-        from: 0, 
-        to: view.state.doc.length, 
-        insert: newValue 
+      changes: {
+        from: 0,
+        to: view.state.doc.length,
+        insert: newValue
       },
     });
     localCode.value = newValue; // Keep local code in sync
@@ -142,8 +149,8 @@ watch(localLang, (newLang) => {
 
 // E. Watch for initial language prop to set the initial code content correctly
 watch(() => props.language, (newLang) => {
-    localLang.value = newLang; // Sync with parent
-}, { immediate: true }); 
+  localLang.value = newLang; // Sync with parent
+}, { immediate: true });
 
 
 // --- EMIT FUNCTIONS ---
@@ -160,10 +167,13 @@ function emitSubmit() {
 <style scoped>
 /* Define the height and style for the CodeMirror host */
 .code-editor-host {
-  height: 200px; /* Swap h-56/h-72 from old textarea */
+  height: 200px;
+  /* Swap h-56/h-72 from old textarea */
   border: 1px solid var(--gry-300);
-  border-radius: 6px; /* Match your component's rounding */
-  overflow: hidden; /* Ensure line numbers are contained */
+  border-radius: 6px;
+  /* Match your component's rounding */
+  overflow: hidden;
+  /* Ensure line numbers are contained */
 }
 
 /* Optional: To make the editor fill the container height */
