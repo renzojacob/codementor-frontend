@@ -5,6 +5,7 @@ import { setupInterceptors } from './interceptors'
 // Create axios instance with base configuration
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  //withCredentials: true, // ← critical for cookies
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

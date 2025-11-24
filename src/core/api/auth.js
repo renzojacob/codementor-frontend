@@ -1,3 +1,4 @@
+// /src/core/api/auth.js
 import { axiosInstance } from '../http/axios'
 
 export const authAPI = {
@@ -8,7 +9,7 @@ export const authAPI = {
 
   logout: async () => {
     const refresh_token = localStorage.getItem('refresh_token')
-    
+
     if (refresh_token) {
       try {
         await axiosInstance.post('/logout', { refresh_token })
@@ -27,5 +28,10 @@ export const authAPI = {
     const refresh_token = localStorage.getItem('refresh_token')
     const response = await axiosInstance.post('/refresh', { refresh_token })
     return response.data
-  }
+  },
+
+  // ✅ Corrected:
+  getGithubAuthUrl: () => axiosInstance.get('/auth/github').then(res => res.data),
+  getGoogleAuthUrl: () => axiosInstance.get('/auth/google').then(res => res.data),
+  getCurrentUser: () => axiosInstance.get('/me'), // must support credentials: 'include'
 }

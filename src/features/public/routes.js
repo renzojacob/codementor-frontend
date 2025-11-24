@@ -19,10 +19,10 @@ export default [
       },
     ],
   },
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('./pages/NotFound.vue'), // your 404 page
-    meta: {title: "Not Found"}
-  },
+  // {
+  //   path: '/:pathMatch(.*)*',
+  //   name: 'NotFound',
+  //   component: () => import('./pages/NotFound.vue'), // your 404 page
+  //   meta: {title: "Not Found"}
+  // },
 ]

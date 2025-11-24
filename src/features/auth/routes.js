@@ -22,6 +22,16 @@ export default [
         name: 'VerifyEmail',
         component: () => import('./pages/VerifyEmail.vue'),
         meta: { title: 'Verify Your Email' }
+      },
+      {
+        path: 'auth',
+        children: [
+          {
+            path: 'callback',
+            name: 'OAuthCallback',
+            component: () => import('./pages/OAuthCallback.vue')
+          }
+        ],
       }
     ],
   }

@@ -106,15 +106,25 @@
 
             <div class="mt-5 grid grid-cols-2 gap-3">
               <!-- Google Login -->
-              <button type="button"
-                class="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-300 ease-out transform hover:scale-[1.02] hover:shadow-md active:scale-[0.98] group">
-                <i class="fab fa-google text-red-500 transition-transform duration-300 group-hover:scale-110"></i>
+              <button 
+                type="button"
+                @click="handleGoogleLogin"
+                :disabled="oauthLoading"
+                class="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-300 ease-out transform hover:scale-[1.02] hover:shadow-md active:scale-[0.98] group disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i class="fab fa-google text-red-500 transition-transform duration-300 group-hover:scale-110 mr-2"></i>
+                <span>Google</span>
               </button>
 
               <!-- GitHub Login -->
-              <button type="button"
-                class="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-300 ease-out transform hover:scale-[1.02] hover:shadow-md active:scale-[0.98] group">
-                <i class="fab fa-github text-gray-800 transition-transform duration-300 group-hover:scale-110"></i>
+              <button 
+                type="button"
+                @click="handleGithubLogin"
+                :disabled="oauthLoading"
+                class="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-300 ease-out transform hover:scale-[1.02] hover:shadow-md active:scale-[0.98] group disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i class="fab fa-github text-gray-800 transition-transform duration-300 group-hover:scale-110 mr-2"></i>
+                <span>GitHub</span>
               </button>
             </div>
           </div>
@@ -195,9 +205,10 @@ const password = ref('')
 const showPassword = ref(false)
 const error = ref('')
 const loading = ref(false)
+const oauthLoading = ref(false)
 const router = useRouter()
 const user = useUserStore()
-const { login: authLogin } = useAuth()
+const { login: authLogin, loginWithGoogle, loginWithGithub } = useAuth()
 
 async function handleLogin() {
   error.value = ''
@@ -217,6 +228,30 @@ async function handleLogin() {
     error.value = err.message
   } finally {
     loading.value = false
+  }
+}
+
+async function handleGoogleLogin() {
+  error.value = ''
+  oauthLoading.value = true
+  try {
+    await loginWithGoogle()
+    // User will be redirected to Google OAuth, so no further action needed here
+  } catch (err) {
+    error.value = err.message
+    oauthLoading.value = false
+  }
+}
+
+async function handleGithubLogin() {
+  error.value = ''
+  oauthLoading.value = true
+  try {
+    await loginWithGithub()
+    // User will be redirected to GitHub OAuth, so no further action needed here
+  } catch (err) {
+    error.value = err.message
+    oauthLoading.value = false
   }
 }
 </script>
