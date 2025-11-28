@@ -1,47 +1,57 @@
 export default [
   {
+    path: '/ai',
+    component: () => import('@/app/layouts/ChatbotLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'AIChatbot',
+        component: () => import('./pages/Dashboard.vue')
+      }]
+  },
+  {
     path: '/app',
     component: () => import('@/app/layouts/MainLayout.vue'),
     children: [
-      { 
-        path: '', 
-        name: 'dashboard', 
+      {
+        path: '',
+        name: 'dashboard',
         component: () => import('./pages/Dashboard.vue'),
         meta: { title: 'Dashboard' }
       },
-      { 
-        path: 'challenges', 
-        name: 'challenges', 
+      {
+        path: 'challenges',
+        name: 'challenges',
         component: () => import('./pages/Challenges.vue'),
         meta: { title: 'Coding Challenges' }
       },
-      { 
-        path: 'challenges/:slug', 
-        name: 'challenge-detail', 
+      {
+        path: 'challenges/:slug',
+        name: 'challenge-detail',
         component: () => import('./pages/ChallengeDetail.vue')
         // \u26a0\ufe0f No meta.title \u2014 set in component (slug-dependent)
       },
-      { 
-        path: 'leaderboard', 
-        name: 'leaderboard', 
+      {
+        path: 'leaderboard',
+        name: 'leaderboard',
         component: () => import('./pages/Leaderboard.vue'),
         meta: { title: 'Leaderboard' }
       },
-      { 
-        path: 'profile', 
-        name: 'profile', 
+      {
+        path: 'profile',
+        name: 'profile',
         component: () => import('./pages/Profile.vue'),
         meta: { title: 'My Profile' }
       },
-      { 
-        path: 'settings', 
-        name: 'settings', 
+      {
+        path: 'settings',
+        name: 'settings',
         component: () => import('./pages/Settings.vue'),
         meta: { title: 'Account Settings' }
       },
-      { 
-        path: 'achievements', 
-        name: 'achievements', 
+      {
+        path: 'achievements',
+        name: 'achievements',
         component: () => import('./pages/Achievements.vue'),
         meta: { title: 'Achievements' }
       },
