@@ -1,4 +1,4 @@
-<!-- src/main/pages/learn/LearnHome.vue -->
+<!-- src/features/learn/pages/LearnHome.vue -->
 <template>
   <div class="p-8">
     <h1 class="text-2xl font-bold mb-6">Choose a Language</h1>
@@ -9,7 +9,7 @@
       <RouterLink
         v-for="lang in languages"
         :key="lang.slug"
-        :to="`/learn/${lang.slug}`"
+        :to="getLanguageRoute(lang.slug)"
         class="p-6 border rounded hover:bg-green-50 transition-colors"
       >
         <h2 class="text-xl font-bold mb-2">{{ lang.name }}</h2>
@@ -22,10 +22,25 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useLearn } from '@/core/composables/useLearn'
 
+const route = useRoute()
 const { languages, fetchLanguages, loading, error } = useLearn()
+
+// Determine if we're in the app (authenticated) context or public context
+const isAppContext = computed(() => route.path.startsWith('/app'))
+
+const getLanguageRoute = (langSlug) => {
+  if (isAppContext.value) {
+    // Authenticated route
+    return `/app/learn/${langSlug}`
+  } else {
+    // Public route  
+    return `/learn/${langSlug}`
+  }
+}
 
 onMounted(() => {
   fetchLanguages()

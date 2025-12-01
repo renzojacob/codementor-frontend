@@ -1,3 +1,4 @@
+// src/features/main/routes.js
 export default [
   {
     path: '/ai',
@@ -70,7 +71,8 @@ export default [
             children: [
               {
                 path: '',
-                redirect: (to) => `/app/learn/${to.params.lang}/intro`, // \u2705 Fixed: was missing leading `/`
+                // FIX: Use relative path to preserve /app base
+                redirect: (to) => `/app/learn/${to.params.lang}/intro`,
               },
               {
                 path: 'try',
@@ -82,7 +84,6 @@ export default [
                 path: ':topic',
                 name: 'MainLearnDynamic',
                 component: () => import('@/features/learn/pages/LearnDynamic.vue')
-                // \u26a0\ufe0f No meta.title \u2014 handled in-component
               },
             ],
           },

@@ -1,3 +1,4 @@
+<!-- src/features/auth/Login.vue -->
 <template>
   <div class="font-sans min-h-screen flex items-center justify-center p-4">
     <div
@@ -207,27 +208,42 @@ const error = ref('')
 const loading = ref(false)
 const oauthLoading = ref(false)
 const router = useRouter()
-const user = useUserStore()
-const { login: authLogin, loginWithGoogle, loginWithGithub } = useAuth()
+const userStore = useUserStore()
+const { login: authLogin, initiateOAuth } = useAuth()
 
 async function handleLogin() {
   error.value = ''
   loading.value = true
+  
   try {
-    const res = await authLogin(username.value, password.value)
-
-    // The useAuth composable already saves tokens and updates the user store
-    // But we need to handle the admin redirect here
-
-    if (user.role === 'admin') {
-      window.location.href = '/admin.html'  // loads the admin SPA
+    const result = await authLogin(username.value, password.value)
+    
+    if (result.success) {
+      // Login successful - redirect based on role
+      await redirectBasedOnRole()
     } else {
-      router.push('/')
+      error.value = result.error || 'Login failed'
     }
   } catch (err) {
-    error.value = err.message
+    error.value = err.message || 'An unexpected error occurred'
+    console.error('Login error:', err)
   } finally {
     loading.value = false
+  }
+}
+
+async function redirectBasedOnRole() {
+  // Give the store a moment to update
+  await new Promise(resolve => setTimeout(resolve, 100))
+  
+  if (userStore.isAdmin) {
+    // Redirect admin to admin dashboard
+    console.log('Redirecting admin to /admin')
+    await router.push('/admin')
+  } else {
+    // Redirect regular user to /app
+    console.log('Redirecting user to /app')
+    await router.push('/app')
   }
 }
 
@@ -235,10 +251,10 @@ async function handleGoogleLogin() {
   error.value = ''
   oauthLoading.value = true
   try {
-    await loginWithGoogle()
-    // User will be redirected to Google OAuth, so no further action needed here
+    await initiateOAuth('google')
+    // User will be redirected to Google OAuth
   } catch (err) {
-    error.value = err.message
+    error.value = err.message || 'Google login failed'
     oauthLoading.value = false
   }
 }
@@ -247,10 +263,10 @@ async function handleGithubLogin() {
   error.value = ''
   oauthLoading.value = true
   try {
-    await loginWithGithub()
-    // User will be redirected to GitHub OAuth, so no further action needed here
+    await initiateOAuth('github')
+    // User will be redirected to GitHub OAuth
   } catch (err) {
-    error.value = err.message
+    error.value = err.message || 'GitHub login failed'
     oauthLoading.value = false
   }
 }

@@ -1,6 +1,11 @@
 // src/core/composables/useChallenges.js
 import { ref } from 'vue'
-import { getChallenges, getChallenge } from '../api/challenges'
+import { 
+  getChallenges, 
+  getChallenge, 
+  submitChallenge, 
+  getSubmission 
+} from '../api/challenges'
 
 export function useChallenges() {
   const challenges = ref([])
@@ -13,19 +18,22 @@ export function useChallenges() {
     error.value = null
     try {
       const res = await getChallenges()
-
       challenges.value = res.data.map(c => ({
         id: c.id,
         slug: c.slug,
         title: c.title,
         description: c.description,
-        difficulty: c.difficulty.toLowerCase(),   // normalize
+        difficulty: c.difficulty.toLowerCase(),
         xp: c.xp_reward,
-        solved: Boolean(c.solved),               // backend already returns it
+        solved: Boolean(c.solved),
         solved_count: c.solved_count ?? 0,
         category_id: c.category_id,
+        tags: c.tags || [],
+        time_limit: c.time_limit || '1s',
+        memory_limit: c.memory_limit || '64MB',
+        total_submissions: c.total_submissions || 0,
+        accepted_submissions: c.accepted_submissions || 0,
       }))
-
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to fetch challenges'
     } finally {
@@ -56,7 +64,13 @@ export function useChallenges() {
         examples: data.examples || [],
         hints: data.hints || [],
         testcases: data.testcases || [],
-        submissions: Array.isArray(data.submissions) ? data.submissions : []
+        submissions: Array.isArray(data.submissions) ? data.submissions : [],
+        user_stats: data.user_stats || {
+          attempts: 0,
+          best_execution_time: null,
+          best_memory_used: null,
+          solved_at: null
+        }
       }
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to fetch challenge'
@@ -67,11 +81,48 @@ export function useChallenges() {
     }
   }
 
+  // Submit solution to challenge
+  const submitSolution = async (challengeId, code, language) => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await submitChallenge(challengeId, {
+        code,
+        language
+      })
+      
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (err) {
+      return {
+        success: false,
+        error: err.response?.data?.message || 'Submission failed'
+      }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Check submission status
+  const checkSubmissionStatus = async (submissionId) => {
+    try {
+      const response = await getSubmission(submissionId)
+      return response.data
+    } catch (err) {
+      console.error('Error checking submission status:', err)
+      return null
+    }
+  }
+
   return {
     challenges,
     loading,
     error,
     fetchChallenges,
-    fetchChallenge
+    fetchChallenge,
+    submitSolution,
+    checkSubmissionStatus
   }
 }

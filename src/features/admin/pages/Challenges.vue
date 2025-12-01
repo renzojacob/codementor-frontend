@@ -856,7 +856,7 @@
 import { ref, computed, onMounted } from 'vue'
 
 // API Base URL - adjust according to your backend
-const API_BASE = 'https://codementor-backend-izws.onrender.com/admin' // Adjust this to match your PHP backend
+const API_BASE = 'http://localhost:3000/admin' // Adjust this to match your PHP backend
 
 // Component State
 const loading = ref(false)

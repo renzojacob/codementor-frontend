@@ -49,7 +49,11 @@ const challengeId = route.params.slug || route.params.id
 
 // Composables
 const { languages, fetchLanguages } = useLearn()
-const { fetchChallenge } = useChallenges()
+const { 
+  fetchChallenge, 
+  submitSolution, 
+  checkSubmissionStatus 
+} = useChallenges()
 
 // Reactive state
 const problem = reactive({
@@ -118,7 +122,7 @@ const executeCode = async (codeToExecute, lang) => {
       }
     }
 
-    const response = await fetch('https://8f7ca0bd-2f2c-4e19-b9a7-dc1905151a70-00-2yqsv7qo87qti.pike.replit.dev:8080/execute', {
+    const response = await fetch('http://localhost:3000/execute', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -141,41 +145,113 @@ const executeCode = async (codeToExecute, lang) => {
 }
 
 const runAndSubmit = async ({ action = 'run', code: submittedCode, lang } = {}) => {
-  const codeToExecute = submittedCode || code.value
-  const langToUse = lang || language.value
+  const codeToExecute = submittedCode || code.value;
+  const langToUse = lang || language.value;
 
   if (action === 'run') {
-    await executeCode(codeToExecute, langToUse)
-    return
+    await executeCode(codeToExecute, langToUse);
+    return;
   }
 
-  // For submit action, run tests first
-  testResults.value = problem.testcases.map((t) => ({
-    id: t.id,
-    name: t.name,
-    status: 'Running',
-    details: '',
-  }))
-
-  // Simulate API call for submission
-  setTimeout(() => {
-    testResults.value = problem.testcases.map((t) => ({
-      id: t.id,
-      name: t.name,
-      status: 'Passed',
-      details: `Expected ${t.expected}`,
-    }))
-
-    if (action === 'submit') {
-      submissions.value.unshift({
-        id: Math.floor(Math.random() * 10000),
-        lang: langToUse,
-        status: 'Accepted',
-        time: `${Math.floor(Math.random() * 100) + 20}ms`,
-        date: new Date().toISOString().slice(0, 10),
-      })
+  // For submit action
+  if (action === 'submit') {
+    executionLoading.value = true;
+    showTerminal.value = true;
+    
+    try {
+      // Submit to backend
+      const result = await submitSolution(problem.id, codeToExecute, langToUse);
+      
+      if (result.success) {
+        executionResult.value = {
+          message: '\u2705 Submission received! Processing your code...',
+          submissionId: result.data.submission_id,
+          status: 'pending'
+        };
+        
+        // Poll for results
+        await pollSubmissionResult(result.data.submission_id);
+      } else {
+        executionResult.value = {
+          error: `\u274c ${result.error}`
+        };
+      }
+    } catch (error) {
+      executionResult.value = {
+        error: `\u274c Submission failed: ${error.message}`
+      };
+    } finally {
+      executionLoading.value = false;
     }
-  }, 700)
+  }
+}
+
+// Add polling method
+const pollSubmissionResult = async (submissionId, maxAttempts = 30) => {
+  let attempts = 0;
+  
+  const poll = async () => {
+    attempts++;
+
+    console.log(`Poll attempt ${attempts} for submission ${submissionId}`); // Add this line
+    const result = await checkSubmissionStatus(submissionId);
+    
+    if (result) {
+      if (result.status === 'pending' || result.status === 'running') {
+        if (attempts < maxAttempts) {
+          // Continue polling
+          executionResult.value = {
+            message: `\u23f3 Processing... (${attempts}/${maxAttempts})`,
+            submissionId: submissionId,
+            status: result.status
+          };
+          setTimeout(poll, 1000); // Poll every second
+          return;
+        } else {
+          // Timeout
+          executionResult.value = {
+            error: '\u23f0 Submission processing timeout'
+          };
+        }
+      } else {
+        // Final result
+        executionResult.value = {
+          message: result.status === 'passed' ? '\u2705 All tests passed!' : '\u274c Some tests failed',
+          details: result,
+          passed: result.status === 'passed',
+          testResults: result.test_results || []
+        };
+        
+        // Update test results display
+        if (result.test_results) {
+          testResults.value = result.test_results.map((test, index) => ({
+            id: index,
+            name: `Test ${index + 1}`,
+            status: test.passed ? 'Passed' : 'Failed',
+            details: `Input: ${test.input} | Expected: ${test.expected_output} | Got: ${test.actual_output}`,
+            passed: test.passed
+          }));
+        }
+        
+        // Refresh challenge data to update solved status and submissions
+        const updatedChallenge = await fetchChallenge(challengeId);
+        if (updatedChallenge) {
+          problem.solved = updatedChallenge.solved;
+          submissions.value = updatedChallenge.submissions || [];
+          
+          // Update problem meta if needed
+          problem.meta.submissions = updatedChallenge.total_submissions || 0;
+          problem.meta.accepted = updatedChallenge.accepted_submissions || 0;
+        }
+      }
+    } else {
+      executionResult.value = {
+        error: '\u274c Failed to get submission result'
+      };
+    }
+  };
+  
+  await poll();
 }
 
 // Lifecycle
@@ -206,5 +282,11 @@ onMounted(async () => {
   })
 
   submissions.value = challenge.submissions || []
+  
+  // Set initial language and code template
+  if (availableLangs.value.length > 0 && !language.value) {
+    language.value = availableLangs.value[0]
+    updateCodeTemplate()
+  }
 })
 </script>

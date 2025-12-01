@@ -1,3 +1,4 @@
+<!-- src/features/learn/components/LessonContent.vue-->
 <template>
   <!-- Loading -->
   <div v-if="loading" class="text-gray-500 text-center py-10">
@@ -8,11 +9,11 @@
   <article v-else-if="lesson" class="prose prose-lg max-w-3xl mx-auto px-6 md:px-10 py-10 leading-relaxed">
     <!-- 🔗 Breadcrumbs -->
     <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2 flex-wrap" aria-label="Breadcrumb">
-      <RouterLink to="/" class="hover:text-blue-600 transition-colors">Home</RouterLink>
+      <RouterLink :to="homeRoute" class="hover:text-blue-600 transition-colors">Home</RouterLink>
       <i class="fas fa-angle-right text-xs"></i>
-      <RouterLink to="/learn" class="hover:text-blue-600 transition-colors">Learn</RouterLink>
+      <RouterLink :to="learnBaseRoute" class="hover:text-blue-600 transition-colors">Learn</RouterLink>
       <i class="fas fa-angle-right text-xs"></i>
-      <RouterLink :to="`/learn/${props.lang}`" class="hover:text-blue-600 transition-colors capitalize">
+      <RouterLink :to="languageRoute" class="hover:text-blue-600 transition-colors capitalize">
         {{ props.lang }}
       </RouterLink>
       <i class="fas fa-angle-right text-xs"></i>
@@ -36,7 +37,8 @@
     </p>
 
     <!-- Sections -->
-    <section :id="`section-${i}`" v-for="(section, i) in lesson.sections" :key="i" class="mb-10 border-b border-gray-100 pb-8">
+    <section :id="`section-${i}`" v-for="(section, i) in lesson.sections" :key="i"
+      class="mb-10 border-b border-gray-100 pb-8">
       <h2 v-if="section.subtitle" class="text-2xl font-semibold mb-3 text-gray-900">
         {{ section.subtitle }}
       </h2>
@@ -59,7 +61,7 @@
           class="text-sm font-mono text-gray-200 bg-gray-800/50 rounded-lg p-4 border border-gray-700 backdrop-blur-sm mb-4">{{ section.code }}</pre>
 
         <div class="flex justify-end">
-          <RouterLink v-if="section.exampleId" :to="`/learn/${props.lang}/try?example=${section.exampleId}`"
+          <RouterLink v-if="section.exampleId" :to="getTryItRoute(section.exampleId)"
             class="inline-flex items-center bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-4 py-2.5 rounded-lg transition-all duration-300 shadow-lg hover:shadow-blue-500/25 font-medium group glow-effect">
             <i class="fas fa-play mr-2 group-hover:scale-110 transition-transform"></i> Execute
           </RouterLink>
@@ -79,11 +81,13 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useApi } from '@/core/composables/useApi'
 import MarkdownIt from 'markdown-it'
 
 const md = new MarkdownIt()
+const route = useRoute()
 
 const props = defineProps({
   lang: { type: String, required: true },
@@ -93,6 +97,19 @@ const props = defineProps({
 const { get, loading, error } = useApi()
 const lesson = ref(null)
 
+// Determine route context
+const isAppContext = computed(() => route.path.startsWith('/app'))
+
+// Dynamic routes
+const homeRoute = computed(() => isAppContext.value ? '/app' : '/')
+const learnBaseRoute = computed(() => isAppContext.value ? '/app/learn' : '/learn')
+const languageRoute = computed(() => isAppContext.value ? `/app/learn/${props.lang}` : `/learn/${props.lang}`)
+
+const getTryItRoute = (exampleId) => {
+  const base = isAppContext.value ? '/app' : ''
+  return `${base}/learn/${props.lang}/try?example=${exampleId}`
+}
+
 async function fetchLesson() {
   try {
     lesson.value = null
@@ -100,7 +117,6 @@ async function fetchLesson() {
     lesson.value = res
   } catch (err) {
     console.error('Failed to fetch lesson:', err)
-    // Error is already handled by useApi composable
   }
 }
 
