@@ -836,7 +836,7 @@
               <!-- Code -->
               <div>
                 <h4 class="font-medium text-gray-900 mb-2">Submitted Code</h4>
-                <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{{ currentSubmission.code }}</code></pre>
+                <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{{ currentSubmission.code_content }}</code></pre>
               </div>
             </div>
 
